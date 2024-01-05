@@ -28,7 +28,7 @@
     "flowbite": "^2.2.1",
     "flowbite-svelte": "^0.44.21",
     "maplibre-gl": "^3.6.2",
-    "mdi-svelte": "^1.1.2",
+    "mdi-svelte-ts": "^1.0.0",
     "numeral": "^2.0.6",
     "p5": "^1.9.0",
     "postcss": "^8.4.32",
