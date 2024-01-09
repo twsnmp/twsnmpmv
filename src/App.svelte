@@ -1,40 +1,23 @@
 <script lang="ts">
   import { BottomNav, BottomNavItem, Tooltip, DarkMode } from "flowbite-svelte";
-  import { DataStore, type TwsnmpEnt } from "./lib/datastore";
-
   import { Icon } from "mdi-svelte-ts";
   import * as icons from "@mdi/js";
   import EditSite from "./lib/EditSite.svelte";
-  import { tick } from "svelte";
+  import List from "./lib/List.svelte";
 
   let page = "list";
-  const ds = new DataStore();
   let showEditSite = false;
-  let twsnmp: TwsnmpEnt;
+  let selected = "";
 
-  const refresh = () => {
-    const oldPage = page;
-    page = "";
-    showEditSite = false;
-    tick();
-    page = oldPage;
-  };
+  const open = (e:CustomEvent<{id:string}>) => {
+    selected = e.detail.id;
+    console.log("open",selected);
+  }
 
-  const addSite = () => {
-    twsnmp = {
-      id: "",
-      name: "New",
-      url: "",
-      user: "",
-      password: "",
-      loc: "",
-    };
-    showEditSite = true;
-  };
 </script>
 
 {#if page == "list"}
-  list
+  <List on:open={open}></List>
 {:else if page == "map"}
   map
 {/if}
@@ -68,7 +51,7 @@
       btnName="追加"
       appBtnPosition="middle"
       btnClass="inline-flex items-center justify-center w-10 h-10 font-medium bg-blue-600 rounded-full hover:bg-blue-700 group focus:ring-4 focus:ring-blue-300 focus:outline-none dark:focus:ring-blue-800 text-white"
-      on:click={addSite}
+      on:click={()=>showEditSite=true}
       >
       <Icon path={icons.mdiPlus} size={2} />
       <Tooltip arrow={false}>追加</Tooltip>
@@ -88,4 +71,4 @@
   </BottomNavItem>
 </BottomNav>
 
-<EditSite {ds} {twsnmp} show={showEditSite} on:close={refresh}></EditSite>
+<EditSite bind:show={showEditSite} twsnmp={{id:"",name:"New",url:"",user:"",password:"",loc:""}}  ></EditSite>

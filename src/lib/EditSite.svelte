@@ -1,25 +1,21 @@
 <script lang="ts">
   import { Modal, Label, Input, GradientButton } from "flowbite-svelte";
-  import { DataStore, type TwsnmpEnt } from "./datastore";
-  import { createEventDispatcher } from "svelte";
+  import { ds, type TwsnmpEnt } from "./datastore";
   import { Icon } from "mdi-svelte-ts";
   import * as icons from "@mdi/js";
 
   export let show = false;
-  export let ds: DataStore;
-  export let twsnmp: TwsnmpEnt;
-
-  const dispatch = createEventDispatcher();
+  export let twsnmp : TwsnmpEnt;
 
   const close = () => {
     show = false;
-    dispatch("close");
   };
+
   const save = () => {
     ds.save(twsnmp);
     show = false;
-    dispatch("close");
   };
+
 </script>
 
 <Modal bind:open={show} size="lg" dismissable={false} class="w-full">
