@@ -53,10 +53,10 @@
   {#each  list as e }
     <ListgroupItem>
       <div class="flex">
-        <div class="m-1">
-          <Icon path={e.icon} size={1} color={e.color}/>
+        <div class="">
+          <Icon path={e.icon} size={2} color={e.color}/>
         </div>
-        <div class="grow">
+        <div class="grow m-1">
           {e.name}
         </div>
         <GradientButton class="!p-2 mr-1" color="lime" on:click={()=>open(e.id)}><Icon path={icons.mdiMap} size={1}/></GradientButton>

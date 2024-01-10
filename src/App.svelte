@@ -11,7 +11,6 @@
 
   const open = (e:CustomEvent<{id:string}>) => {
     selected = e.detail.id;
-    console.log("open",selected);
   }
 
 </script>

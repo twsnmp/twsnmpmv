@@ -20,7 +20,6 @@ export class TwsnmpAPI {
       })
       if (res.status == 200) {
         const r = await res.json();
-        console.log(r);
         if (r && r.token ) {
           this.token = r.token;
           return true;

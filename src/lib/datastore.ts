@@ -2,6 +2,7 @@ import { Preferences } from '@capacitor/preferences';
 import { v4 as uuidv4 } from 'uuid';
 import * as icons from "@mdi/js";
 import { writable } from 'svelte/store';
+import { TwsnmpAPI } from './twsnmpapi';
 
 export const refreshCount = writable(0);
 export interface TwsnmpEnt  {
@@ -15,9 +16,14 @@ export interface TwsnmpEnt  {
 
 export class DataStore {
   list :TwsnmpEnt[]
+  stateMap: Map<string,string>
+  timer: any
+  checkIndex: number
   constructor () {
     this.list = [];
     this.load();
+    this.stateMap = new Map();
+    this.checkIndex = 0;
   }
   // 読み込み
   async load() {
@@ -33,6 +39,7 @@ export class DataStore {
       this.list.push(e);
     }
     refreshCount.update(n=>n+1);
+    this.checkSite();
   }
   // 保存
   public async save(t :TwsnmpEnt) {
@@ -45,8 +52,10 @@ export class DataStore {
     const v = JSON.stringify(t);
     await Preferences.configure({group:"twsnmpmv"});
     await Preferences.set({key:t.id,value:v});
-    console.log(this.list);
     refreshCount.update(n=>n+1);
+    if(this.list.length == 1) {
+      this.checkSite();
+    }
   }
   // 削除
   async del(id :string) {
@@ -71,8 +80,62 @@ export class DataStore {
       loc: "",
     }
   }
+  async checkOneSite(i:number) {
+    const t = this.list[i];
+    const api = new TwsnmpAPI(t.url);
+    if(!await api.login(t.user,t.password) ) {
+      this.stateMap.set(t.id,"unknown");
+      refreshCount.update(n=>n+1);
+      return;
+    }
+    let state = "unknown";
+    const nodes = await api.get("/api/nodes");
+    if(nodes && nodes.length >0 ) {
+      for(const n of nodes) {
+        if(n.State == "high") {
+          state  = "high";
+          break;
+        } 
+        if (state == "low" || n.State == "low") {
+          state = "low";
+          continue;
+        }
+        if (state == "warn" || n.State == "warn") {
+          state = "warn";
+          continue;
+        }
+        if(n.State == "normal" || n.State == "repair") {
+          state = "normal";
+        }
+      }
+    }
+    this.stateMap.set(t.id,state);
+    refreshCount.update(n=>n+1);
+  }
+  checkSite() {
+    let t = 1;
+    if (this.list.length == 0) {
+      this.timer = undefined;
+      return;
+    }
+    if (this.checkIndex >= this.list.length) {
+      this.checkIndex = 0;
+      if (this.list.length < 60) {
+        t = 60 - this.list.length;
+      }
+    }
+    this.checkOneSite(this.checkIndex);
+    this.checkIndex++;
+    this.timer = setTimeout(()=>this.checkSite(),t * 1000);
+  }
+  stopSiteCheck() {
+    if(this.timer) {
+      clearTimeout(this.timer);
+      this.timer = undefined;
+    }
+  }
   getState(id:string) :string {
-    return "normal";
+    return this.stateMap.get(id) || "unknown";
   }
 }
 
