@@ -142,13 +142,13 @@ export class DataStore {
 export const getStateColor = (s:string):string => {
   switch(s) {
     case "normal":
-      return "green";
+      return "#33a02c";
     case "warn":
-      return "yellow";
+      return "#dfdf22";
     case "low":
-      return "pink";
+      return "#fb9a99";
     case "high":
-      return "red";
+      return "#e31a1c";
     }
     return "gray";
 }
