@@ -4,6 +4,7 @@
   import * as icons from "@mdi/js";
   import EditSite from "./lib/EditSite.svelte";
   import List from "./lib/List.svelte";
+  import Map from "./lib/Map.svelte";
 
   let page = "list";
   let showEditSite = false;
@@ -11,6 +12,7 @@
 
   const open = (e:CustomEvent<{id:string}>) => {
     selected = e.detail.id;
+    page = "map";
   }
 
 </script>
@@ -18,9 +20,10 @@
 {#if page == "list"}
   <List on:open={open}></List>
 {:else if page == "map"}
-  map
+  <Map id={selected}></Map>
 {/if}
 
+{#if page != "map" }
 <BottomNav
   position="absolute"
   navType="application"
@@ -69,5 +72,6 @@
     <Tooltip arrow={false}>ダーク</Tooltip>
   </BottomNavItem>
 </BottomNav>
+{/if}
 
 <EditSite bind:show={showEditSite} twsnmp={{id:"",name:"New",url:"",user:"",password:"",loc:""}}  ></EditSite>

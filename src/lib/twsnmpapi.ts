@@ -31,19 +31,28 @@ export class TwsnmpAPI {
       return false;
     }
   }
-  async get(api:string) :Promise<any> {
+  async get(api:string,type: string = "json") :Promise<any> {
     try {
       const res = await fetch(this.url + api, {
         method: 'GET',
         headers: {
         'Authorization': 'Bearer ' + this.token,
         },
-      })
+      });
       if (res.status != 200) {
         return undefined;
       }
-      return await res.json();
+      switch(type) {
+      case "json":
+        return await res.json();
+      case "data":
+        const reader = new FileReader()
+        reader.readAsDataURL(await res.blob());
+        await new Promise<void>(resolve => reader.onload = () => resolve());
+        return reader.result
+      }
     } catch (e) {
+      console.log(e);
       return undefined;
     }
   }
