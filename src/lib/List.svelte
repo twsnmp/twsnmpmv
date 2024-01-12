@@ -59,13 +59,14 @@
         <div class="grow m-1">
           {e.name}
         </div>
-        <GradientButton class="!p-2 mr-1" color="lime" on:click={()=>open(e.id)}><Icon path={icons.mdiMap} size={1}/></GradientButton>
+        <GradientButton class="!p-2 mr-1" color="lime" on:click={()=>open(e.id)}><Icon path={icons.mdiNetwork} size={1}/></GradientButton>
         <GradientButton class="!p-2 mr-1" color="blue" on:click={()=>edit(e.id)}><Icon path={icons.mdiPencil} size={1}/></GradientButton>
         <GradientButton class="!p-2" color="red" on:click={()=>delConfirm(e.id)}><Icon path={icons.mdiTrashCan} size={1} /></GradientButton>
       </div>
     </ListgroupItem>
   {/each}
 </Listgroup>
+<div class="h-32"></div>
 
 <EditSite  bind:show={showEditSite} {twsnmp}  ></EditSite>
 

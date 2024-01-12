@@ -4,11 +4,15 @@ import { TwsnmpAPI } from "./twsnmpapi";
 
 const MAP_SIZE_X = window.screen.width > 4000 ? 5000 : 2500;
 const MAP_SIZE_Y = 5000;
+
 let mapRedraw = true;
 
-let nodes: any = {};
-let lines: any = [];
-let items: any = {};
+export let nodes: any = {};
+export let lines: any = [];
+export let items: any = {};
+export let pollings: any = {};
+export let logs:  any = {};
+
 let backImage: any = {
   X: 0,
   Y: 0,
@@ -18,23 +22,26 @@ let backImage: any = {
 };
 let _backImage: any = undefined;
 
-let fontSize = 12;
-let iconSize = 32;
-
-const selectedNodes: any = [];
-const selectedDrawItems: any = [];
+let fontSize = 10;
+let iconSize = 24;
 
 const imageMap = new Map();
 
 let _mapP5: P5 | undefined = undefined;
-let api: TwsnmpAPI;
+export let api: TwsnmpAPI;
 
 export const initMAP = async (div: HTMLElement, twsnmp: TwsnmpEnt) => {
+  _backImage = null;
+  mapRedraw = false;
+  nodes = [];
+  lines = [];
+  items = [];
+  pollings = [];
+  logs = [];
   api = new TwsnmpAPI(twsnmp.url);
   if (!(await api.login(twsnmp.user, twsnmp.password))) {
     return;
   }
-  mapRedraw = false;
   if (_mapP5 != undefined) {
     return;
   }
@@ -49,18 +56,19 @@ let oldBackImagePath = "";
 export const updateMAP = async () => {
   const dark = isDark();
   const map = await api.get("/api/map");
-  console.log(map);
-  const z = map.MapConf.IconSize || 24;
-  iconSize = z;
-  fontSize = 12;
+  if (!map) {
+    return;
+  }
+  iconSize = map.MapConf.IconSize || 24;
+  fontSize = map.MapConf.FontSize || 12;
   nodes = map.Nodes;
   lines = map.Lines;
   items = map.Items;
+  logs = map.Logs;
   backImage = map.MapConf.BackImage;
 
   if (backImage && backImage.Path && oldBackImagePath != backImage.Path && _mapP5 != undefined) {
     oldBackImagePath = backImage.Path;
-    console.log("load backimage",oldBackImagePath)
     _backImage = null;
     _mapP5.loadImage(await api.get("/backimage","data"), (img) => {
       _backImage = img;
@@ -188,18 +196,6 @@ const mapMain = (p5: P5) => {
     for (const k in items) {
       p5.push();
       p5.translate(items[k].X, items[k].Y);
-      if (selectedDrawItems.includes(items[k].ID)) {
-        if (dark) {
-          p5.fill("rgba(23,23,23,0.9)");
-          p5.stroke("#ccc");
-        } else {
-          p5.fill("rgba(252,252,252,0.9)");
-          p5.stroke("#333");
-        }
-        const w = items[k].W + 10;
-        const h = items[k].H + 10;
-        p5.rect(-5, -5, w, h);
-      }
       switch (items[k].Type) {
         case 0: // rect
           p5.fill(items[k].Color);
@@ -275,26 +271,15 @@ const mapMain = (p5: P5) => {
       const icon = getIconCode(nodes[k].Icon);
       p5.push();
       p5.translate(nodes[k].X, nodes[k].Y);
-      if (selectedNodes.includes(nodes[k].ID)) {
-        if (dark) {
-          p5.fill("rgba(23,23,23,0.9)");
-        } else {
-          p5.fill("rgba(252,252,252,0.9)");
-        }
-        p5.stroke(getStateColor(nodes[k].State));
-        const w = iconSize + 16;
-        p5.rect(-w / 2, -w / 2, w, w);
+      if (dark) {
+        p5.fill("rgba(23,23,23,0.9)");
+        p5.stroke("rgba(23,23,23,0.9)");
       } else {
-        if (dark) {
-          p5.fill("rgba(23,23,23,0.9)");
-          p5.stroke("rgba(23,23,23,0.9)");
-        } else {
-          p5.fill("rgba(252,252,252,0.9)");
-          p5.stroke("rgba(252,252,252,0.9)");
-        }
-        const w = iconSize - 8;
-        p5.rect(-w / 2, -w / 2, w, w);
+        p5.fill("rgba(252,252,252,0.9)");
+        p5.stroke("rgba(252,252,252,0.9)");
       }
+      const w = iconSize - 8;
+      p5.rect(-w / 2, -w / 2, w, w);
       p5.textFont("Material Design Icons");
       p5.textSize(iconSize);
       p5.textAlign(p5.CENTER, p5.CENTER);
