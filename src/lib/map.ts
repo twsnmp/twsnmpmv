@@ -1,6 +1,7 @@
 import P5 from "p5";
 import { type TwsnmpEnt } from "./datastore";
 import { TwsnmpAPI } from "./twsnmpapi";
+import * as echarts from 'echarts';
 
 const MAP_SIZE_X = window.screen.width > 4000 ? 5000 : 2500;
 const MAP_SIZE_Y = 5000;
@@ -301,62 +302,144 @@ const mapMain = (p5: P5) => {
 const stateMap = new Map();
 
 const stateList = [
-  { color: "#e31a1c", value: "high" },
-  { color: "#fb9a99", value: "low" },
-  { color: "#dfdf22", value: "warn" },
-  { color: "#33a02c", value: "normal" },
-  { color: "#1f78b4", value: "repair" },
-  { color: "#1f78b4", value: "info" },
+  { color: "#e31a1c", value: "high", name:"重度",icon: "mdi-alert-circle" },
+  { color: "#fb9a99", value: "low" , name:"軽度",icon: "mdi-alert-circle"},
+  { color: "#dfdf22", value: "warn", name:"注意",icon: "mdi-alert" },
+  { color: "#33a02c", value: "normal",name:"正常",icon: "mdi-check-circle" },
+  { color: "#1f78b4", value: "repair",name:"復帰",icon: "mdi-autorenew" },
+  { color: "#1f78b4", value: "info" ,name:"情報",icon: "mdi-information"},
 ];
 
 stateList.forEach((e: any) => {
   stateMap.set(e.value, e);
 });
 
-const getStateColor = (state: string): string => {
+export const getStateColor = (state: string): string => {
   return stateMap.has(state) ? stateMap.get(state).color : "gray";
 };
 
-export const iconList = [
-  { value: "desktop", code: 0xf01c4 },
-  { value: "desktop-classic", code: 0xf07c0 },
-  { value: "laptop", code: 0xf0322 },
-  { value: "tablet", code: 0xf04f8 },
-  { value: "server", code: 0xf048b },
-  { value: "hdd", code: 0xf0a60 },
-  { value: "ip", code: 0xf0a60 },
-  { value: "network", code: 0xf0317 },
-  { value: "wifi", code: 0xf05a9 },
-  { value: "cloud", code: 0xf015f },
-  { value: "printer", code: 0xf042a },
-  { value: "cellphone", code: 0xf011c },
-  { value: "router", code: 0xf11e2 },
-  { value: "web", code: 0xf059f },
-  { value: "db", code: 0xf01bc },
-  { value: "mdi-router-wireless", code: 0xf0469 },
-  { value: "mdi-router-network", code: 0xf1087 },
-  { value: "mdi-security", code: 0xf0483 },
-  { value: "mdi-desktop-tower", code: 0xf01c5 },
-  { value: "mdi-microsoft-windows", code: 0xf05b3 },
-  { value: "mdi-linux", code: 0xf033d },
-  { value: "mdi-raspberry-pi", code: 0xf043f },
-  { value: "mdi-mailbox", code: 0xf06ee },
-  { value: "mdi-clock", code: 0xf0954 },
-  { value: "mdi-android", code: 0xf0032 },
-  { value: "mdi-microsoft-azure", code: 0xf0805 },
-  { value: "mdi-amazon", code: 0xf002d },
-  { value: "mdi-apple", code: 0xf0035 },
-  { value: "mdi-google", code: 0xf02ad },
-  { value: "mdi-disc-player", code: 0xf0960 },
-  { value: "mdi-layers-search", code: 0xf1206 },
-];
+export const getStateName = (state: string): string => {
+  return stateMap.has(state) ? stateMap.get(state).name : "不明";
+};
 
+export const getStateIcon = (state: string): string => {
+  return stateMap.has(state) ? stateMap.get(state).icon : "mdi-comment-question-outline";
+};
+
+export const iconList = [
+  {icon: 'mdi-desktop-mac',value: 'desktop',code: 0xF01C4,},
+  {icon: 'mdi-desktop-classic',value: 'desktop-classic',code: 0xF07C0,},
+  { icon: 'mdi-laptop', value: 'laptop' ,code: 0xF0322},
+  { icon: 'mdi-tablet-ipad', value: 'tablet' ,code:0xF04F8},
+  { icon: 'mdi-server', value: 'server' ,code: 0xF048B},
+  { icon: 'mdi-ip-network', value: 'hdd' ,code: 0xF0A60},
+  { icon: 'mdi-ip-network', value: 'ip' ,code: 0xF0A60},
+  { icon: 'mdi-lan', value: 'network' ,code: 0xF0317},
+  { icon: 'mdi-wifi', value: 'wifi' ,code: 0xF05A9},
+  { icon: 'mdi-cloud', value: 'cloud' ,code: 0xF015F },
+  { icon: 'mdi-printer', value: 'printer' ,code: 0xF042A},
+  { icon: 'mdi-cellphone', value: 'cellphone' ,code: 0xF011C},
+  { icon: 'mdi-router', value: 'router' ,code: 0xF11E2},
+  { icon: 'mdi-web', value: 'web' ,code: 0xF059F},
+  { icon: 'mdi-database', value: 'db' ,code: 0xF01BC},
+  { icon: 'mdi-router-wireless', value: 'mdi-router-wireless' ,code: 0xF0469},
+  { icon: 'mdi-router-network', value: 'mdi-router-network' ,code: 0xF1087},
+  { icon: 'mdi-security', value: 'mdi-security' ,code: 0xF0483},
+  { icon: 'mdi-desktop-tower', value: 'mdi-desktop-tower' ,code: 0xF01C5},
+  { icon: 'mdi-microsoft-windows', value: 'mdi-microsoft-windows' ,code: 0xF05B3},
+  { icon: 'mdi-linux', value: 'mdi-linux' ,code: 0xF033D},
+  { icon: 'mdi-raspberry-pi', value: 'mdi-raspberry-pi' ,code: 0xF043F},
+  { icon: 'mdi-mailbox', value: 'mdi-mailbox' ,code: 0xF06EE},
+  { icon: 'mdi-clock', value: 'mdi-clock' ,code: 0xF0954},
+  { icon: 'mdi-android', value: 'mdi-android' ,code: 0xF0032},
+  { icon: 'mdi-microsoft-azure', value: 'mdi-microsoft-azure' ,code: 0xF0805},
+  { icon: 'mdi-amazon', value: 'mdi-amazon' ,code: 0xF002D},
+  { icon: 'mdi-apple', value: 'mdi-apple' ,code: 0xF0035},
+  { icon: 'mdi-google', value: 'mdi-google' ,code: 0xF02AD},
+  { icon: 'mdi-disc-player', value: 'mdi-disc-player' ,code: 0xF0960},
+  { icon: 'mdi-layers-search', value: 'mdi-layers-search' ,code: 0xF1206},
+ 
+ ];
+
+const iconMap = new Map();
 const iconCodeMap = new Map();
 
 iconList.forEach((e) => {
+  iconMap.set(e.value, e.icon);
   iconCodeMap.set(e.value, String.fromCodePoint(e.code));
 });
 
 const getIconCode = (icon: string): number => {
-  return iconCodeMap.get(icon) || String.fromCodePoint(0xf0a39);
+  return iconCodeMap.has(icon) ? iconCodeMap.get(icon) : String.fromCodePoint(0xf0a39);
 };
+
+const getIcon = (icon: string): number => {
+  return iconMap.get(icon) || 'mdi-comment-question-outline';
+};
+
+
+export const formatTime = (date:any, format:string) => {
+  if (!format) {
+      format = '{yyyy}/{MM}/{dd} {HH}:{mm}:{ss}'
+  }
+  return echarts.time.format(date,format,false)
+}
+
+export const renderTime = (t:number,type:string) => {
+  if (t < 1) {
+    return "";
+  }
+  const d = new Date(t /(1000*1000));
+  return  formatTime(d,"");
+}
+
+export const renderState = (state:string,type:string) => {
+  if(type=="sort") {
+    return levelNum(state);
+  }
+  return `<span class="mdi ` +
+      getStateIcon(state) +
+      ` text-lg" style="color:` +
+      getStateColor(state) +
+      `;"></span><span class="ml-2">` +
+      getStateName(state) +
+      `</span>`;
+};
+
+export const renderNodeState = (state:string,type:string,n:any) => {
+  if(type=="sort") {
+    return levelNum(state);
+  }
+  const icon = n.Icon ? getIcon(n.Icon) : getStateIcon(state);
+  return `<span class="mdi ` +
+      icon +
+      ` text-xl" style="color:` +
+      getStateColor(state) +
+      `;"></span><span class="ml-2">` +
+      getStateName(state) +
+      `</span>`;
+};
+
+export const renderIP = (ip:string,type:string) => {
+  if (type=="sort") {
+    return ip.split(".").reduce((int, v) => (Number(int) * 256  +Number(v)) + "");
+  }
+  return ip;
+}
+
+
+export const  levelNum = (s :string) :number => {
+	switch (s) {
+	case "high":
+		return 0;
+	case "low":
+		return 1;
+	case "warn":
+		return 2;
+	case "normal":
+		return 4
+	case "repair":
+		return 3
+	}
+	return 5
+}
