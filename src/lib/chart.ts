@@ -191,7 +191,134 @@ export const showLogChart = (div:string, logs:any) => {
   chart.resize();
 }
 
-export const resizeLogChart = () => {
+const makeStateChart = (div:string) => {
+  chart = echarts.init(document.getElementById(div),"dark");
+  const option = {
+    title: {
+      show: false,
+    },
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: {
+        type: 'shadow',
+      },
+    },
+    grid: {
+      left: '3%',
+      right: '4%',
+      bottom: '3%',
+      containLabel: true
+    },
+    xAxis: {
+      type: 'value',
+    },
+    yAxis: {
+      type: 'category',
+      data: ['']
+    },
+    series: [
+      {
+        name: "重度",
+        type: 'bar',
+        color: '#e31a1c',
+        stack: 'count',
+        large: true,
+        data: [],
+      },
+      {
+        name: "軽度",
+        type: 'bar',
+        color: '#fb9a99',
+        stack: 'count',
+        large: true,
+        data: [],
+      },
+      {
+        name: "注意",
+        type: 'bar',
+        color: '#dfdf22',
+        stack: 'count',
+        data: [],
+      },
+      {
+        name: "正常",
+        type: 'bar',
+        color: "#33a02c",
+        stack: 'count',
+        data: [],
+      },
+      {
+        name: "復帰",
+        type: 'bar',
+        color: '#1f78b4',
+        stack: 'count',
+        data: [],
+      },
+      {
+        name: "その他",
+        type: 'bar',
+        color: 'gray',
+        stack: 'count',
+        data: [],
+      },
+    ],
+    legend: {
+      textStyle: {
+        fontSize: 8,
+        color: '#ccc',
+      },
+      data: ["重度","軽度","注意","正常","復帰","その他"],
+    },
+  }
+  chart.setOption(option);
+  chart.resize();
+}
+
+
+export const showStateChart = (div:string, list:any) => {
+  if (chart) {
+    chart.dispose();
+  }
+  makeStateChart(div)
+  const count :any = {
+    high: 0,
+    low: 0,
+    warn: 0,
+    normal: 0,
+    reair: 0,
+    other: 0,
+  }
+  list.forEach((e:any) => {
+    const s = count[e.State] != undefined ? e.State : 'other';
+    count[s]++;
+  })
+  chart.setOption({
+    series: [
+      {
+        data: [count.high],
+      },
+      {
+        data: [count.low],
+      },
+      {
+        data: [count.warn],
+      },
+      {
+        data: [count.normal],
+      },
+      {
+        data: [count.reair],
+      },
+      {
+        data: [count.other],
+      },
+    ],
+  });
+  chart.resize();
+}
+
+
+export const resizeChart = () => {
   if (chart) {
     chart.resize();
   }

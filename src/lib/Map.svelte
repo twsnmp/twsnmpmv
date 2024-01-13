@@ -7,6 +7,7 @@
   import {ds } from "./datastore";
   import { createEventDispatcher } from "svelte";
   import Log from "./Log.svelte";
+  import Node from "./Node.svelte";
 
 
   export let id:string;
@@ -106,3 +107,4 @@ classInner="grid-cols-6"
 </BottomNav>
 
 <Log bind:show={showLog}></Log>
+<Node bind:show={showNode}></Node>

@@ -4,10 +4,10 @@
   import * as icons from "@mdi/js";
   import DataTable from "datatables.net-dt";
   import "datatables.net-select-dt";
-  import {logs,renderState,renderTime} from "./map";
+  import {nodes,renderNodeState,renderIP} from "./map";
   import ja from "datatables.net-plugins/i18n/ja.json";
   import { tick } from "svelte";
-  import {showLogChart,resizeChart} from "./chart";
+  import {showStateChart,resizeChart} from "./chart";
 
   export let show = false;
   let table :any = undefined;
@@ -31,49 +31,42 @@
       scrollY: "50vh",
       scrollX: true,
       language: ja,
-      order: [[1, "desc"]],
+      order: [[0, "asc"]],
     });
   };
 
   const columns = [
     {
-      data: "Level",
-      title: "レベル",
-      render: renderState,
+      data: "State",
+      title: "状態",
+      render: renderNodeState,
     },
     {
-      data: "Time",
-      title: "日時",
-      render: renderTime,
+      data: "Name",
+      title: "名前",
     },
     {
-      data: "Type",
-      title: "タイプ",
+      data: "IP",
+      title: "IPアドレス",
+      render: renderIP,
     },
     {
-      data: "NodeName",
-      title: "ノード",
-    },
-    {
-      data: "Event",
-      title: "イベント",
+      data: "MAC",
+      title: "MACアドレス",
     },
   ];
 
   const onOpen = async () => {
-    console.log("on open");
     data = [];
-    if (!logs) {
+    if (!nodes) {
       return;
     }
-    for(const l of logs) {
-      if (l.Type != "user" ) {
-        data.push(l);
-      }
+    for(const k in nodes) {
+      data.push(nodes[k]);
     }
     await tick();
     showTable();
-    showLogChart("chart",data);
+    showStateChart("chart",data);
   };
 </script>
 
