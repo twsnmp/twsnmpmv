@@ -317,6 +317,119 @@ export const showStateChart = (div:string, list:any) => {
   chart.resize();
 }
 
+const makeAIChart = (div:string) => {
+  chart = echarts.init(document.getElementById(div),"dark");
+  const option = {
+    title: {
+      show: false,
+    },
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: {
+        type: 'shadow',
+      },
+    },
+    grid: {
+      left: '3%',
+      right: '4%',
+      bottom: '3%',
+      containLabel: true
+    },
+    xAxis: {
+      type: 'value',
+    },
+    yAxis: {
+      type: 'category',
+      data: ['']
+    },
+    series: [
+      {
+        name: "重度",
+        type: 'bar',
+        color: '#e31a1c',
+        stack: 'count',
+        large: true,
+        data: [],
+      },
+      {
+        name: "軽度",
+        type: 'bar',
+        color: '#fb9a99',
+        stack: 'count',
+        large: true,
+        data: [],
+      },
+      {
+        name: "注意",
+        type: 'bar',
+        color: '#dfdf22',
+        stack: 'count',
+        data: [],
+      },
+      {
+        name: "正常",
+        type: 'bar',
+        color: "#33a02c",
+        stack: 'count',
+        data: [],
+      },
+    ],
+    legend: {
+      textStyle: {
+        fontSize: 8,
+        color: '#ccc',
+      },
+      data: ["重度","軽度","注意","正常"],
+    },
+  }
+  chart.setOption(option);
+  chart.resize();
+}
+
+
+export const showAIChart = (div:string, list:any) => {
+  if (chart) {
+    chart.dispose();
+  }
+  makeAIChart(div)
+  const count :any = {
+    high: 0,
+    low: 0,
+    warn: 0,
+    normal: 0,
+  }
+  list.forEach((e:any) => {
+    const s = "normal";
+    if(e.Score > 66 ) {
+      count.high++;
+    } else if (e.Score > 58 ) {
+      count.low++;
+    } else if (e.Score > 50) {
+      count.warn++;
+    } else {
+      count.normal++;
+    }
+    count[s]++;
+  })
+  chart.setOption({
+    series: [
+      {
+        data: [count.high],
+      },
+      {
+        data: [count.low],
+      },
+      {
+        data: [count.warn],
+      },
+      {
+        data: [count.normal],
+      },
+    ],
+  });
+  chart.resize();
+}
+
 
 export const resizeChart = () => {
   if (chart) {

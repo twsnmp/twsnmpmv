@@ -387,6 +387,9 @@ export const formatTime = (date:any, format:string) => {
 }
 
 export const renderTime = (t:number,type:string) => {
+  if(type=="sort") {
+    return t;
+  }
   if (t < 1) {
     return "";
   }
@@ -443,4 +446,41 @@ export const  levelNum = (s :string) :number => {
 		return 3
 	}
 	return 5
+}
+
+export const renderScore = (score: number,type:string): any => {
+  if (type == "sort") {
+    return score;
+  }
+  return (
+    `<span class="mdi ` +
+    getScoreIcon(score) +
+    ` text-xl" style="color:` +
+    getScoreColor(score) +
+    `;"></span><span class="ml-2">` +
+    score.toFixed(2) +
+    `</span>`
+  );
+};
+
+export const getScoreColor = (s:number) => {
+  if (s > 66) {
+    return getStateColor('high')
+  } else if (s >= 58) {
+    return getStateColor('low')
+  } else if (s > 50) {
+    return getStateColor('warn')
+  }
+  return getStateColor('info')
+}
+
+export const getScoreIcon = (s:number) => {
+  if (s > 66) {
+    return 'mdi-emoticon-dead-outline'
+  } else if (s > 58) {
+    return 'mdi-emoticon-sad-outline'
+  } else if (s > 50) {
+    return 'mdi-emoticon-sick-outline'
+  }
+  return 'mdi-emoticon-excited-outline'
 }
