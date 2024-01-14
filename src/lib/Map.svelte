@@ -8,6 +8,7 @@
   import { createEventDispatcher } from "svelte";
   import Log from "./Log.svelte";
   import Node from "./Node.svelte";
+  import Polling from "./Polling.svelte";
 
 
   export let id:string;
@@ -108,3 +109,4 @@ classInner="grid-cols-6"
 
 <Log bind:show={showLog}></Log>
 <Node bind:show={showNode}></Node>
+<Polling bind:show={showPolling}></Polling>

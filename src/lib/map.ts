@@ -34,10 +34,10 @@ export let api: TwsnmpAPI;
 export const initMAP = async (div: HTMLElement, twsnmp: TwsnmpEnt) => {
   _backImage = null;
   mapRedraw = false;
-  nodes = [];
+  nodes = {};
   lines = [];
   items = [];
-  pollings = [];
+  pollings = {};
   logs = [];
   api = new TwsnmpAPI(twsnmp.url);
   if (!(await api.login(twsnmp.user, twsnmp.password))) {
@@ -65,6 +65,7 @@ export const updateMAP = async () => {
   nodes = map.Nodes;
   lines = map.Lines;
   items = map.Items;
+  pollings = map.Pollings;
   logs = map.Logs;
   backImage = map.MapConf.BackImage;
 

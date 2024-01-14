@@ -4,10 +4,10 @@
   import * as icons from "@mdi/js";
   import DataTable from "datatables.net-dt";
   import "datatables.net-select-dt";
-  import {logs,renderState,renderTime} from "./map";
+  import {nodes,pollings,renderState,renderTime} from "./map";
   import ja from "datatables.net-plugins/i18n/ja.json";
   import { tick } from "svelte";
-  import {showLogChart,resizeChart} from "./chart";
+  import {showStateChart,resizeChart} from "./chart";
 
   export let show = false;
   let table :any = undefined;
@@ -31,49 +31,53 @@
       scrollY: "50vh",
       scrollX: true,
       language: ja,
-      order: [[1, "desc"]],
+      order: [[0, "asc"]],
     });
   };
 
+  const getNodeName = (id:string) => {
+    return nodes ? nodes[id].Name || "" : "";
+  }
+
   const columns = [
     {
-      data: "Level",
-      title: "レベル",
+      data: "State",
+      title: "状態",
       render: renderState,
     },
     {
-      data: "Time",
-      title: "日時",
-      render: renderTime,
+      data: "NodeID",
+      title: "ノード名",
+      render: (id:string) => getNodeName(id),
+    },
+    {
+      data: "Name",
+      title: "名前",
     },
     {
       data: "Type",
       title: "タイプ",
     },
     {
-      data: "NodeName",
-      title: "ノード",
-    },
-    {
-      data: "Event",
-      title: "イベント",
+      data: "LastTime",
+      title: "最終確認",
+      render: renderTime,
     },
   ];
 
   const onOpen = async () => {
-    console.log("on open");
     data = [];
-    if (!logs) {
+    if (!nodes|| !pollings) {
       return;
     }
-    for(const l of logs) {
-      if (l.Type != "user" ) {
-        data.push(l);
-      }
+    for(const k in pollings) {
+      for( const p of pollings[k]) {
+        data.push(p);
+      } 
     }
     await tick();
     showTable();
-    showLogChart("chart",data);
+    showStateChart("chart",data);
   };
 </script>
 
