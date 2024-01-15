@@ -3,7 +3,7 @@ import * as echarts from 'echarts'
 let chart :any;
 
 const makeLogChart = (div:string) => {
-  chart = echarts.init(document.getElementById(div),"dark");
+  chart = echarts.init(document.getElementById(div),isDark() ? "dark" : "");
   const option = {
     title: {
       show: false,
@@ -101,7 +101,7 @@ const makeLogChart = (div:string) => {
     legend: {
       textStyle: {
         fontSize: 8,
-        color: '#ccc',
+        color: isDark () ? '#ccc' : '#333',
       },
       data: ["重度","軽度","注意","その他"],
     },
@@ -192,7 +192,7 @@ export const showLogChart = (div:string, logs:any) => {
 }
 
 const makeStateChart = (div:string) => {
-  chart = echarts.init(document.getElementById(div),"dark");
+  chart = echarts.init(document.getElementById(div),isDark() ? "dark" : "");
   const option = {
     title: {
       show: false,
@@ -203,17 +203,13 @@ const makeStateChart = (div:string) => {
         type: 'shadow',
       },
     },
-    grid: {
-      left: '3%',
-      right: '4%',
-      bottom: '3%',
-      containLabel: true
-    },
     xAxis: {
       type: 'value',
+      show:false,
     },
     yAxis: {
       type: 'category',
+      show:false,
       data: ['']
     },
     series: [
@@ -265,7 +261,7 @@ const makeStateChart = (div:string) => {
     legend: {
       textStyle: {
         fontSize: 8,
-        color: '#ccc',
+        color: isDark() ? '#ccc' : '#333',
       },
       data: ["重度","軽度","注意","正常","復帰","その他"],
     },
@@ -285,7 +281,7 @@ export const showStateChart = (div:string, list:any) => {
     low: 0,
     warn: 0,
     normal: 0,
-    reair: 0,
+    repair: 0,
     other: 0,
   }
   list.forEach((e:any) => {
@@ -295,22 +291,46 @@ export const showStateChart = (div:string, list:any) => {
   chart.setOption({
     series: [
       {
-        data: [count.high],
+        data: [list.length ? 100 * count.high/list.length : 0],
+        label: {
+          show: true,
+          formatter: (params:any) => Math.round(params.value * 10) / 10 + '%'
+        },
       },
       {
-        data: [count.low],
+        data: [list.length ? 100 * count.low/list.length : 0],
+        label: {
+          show: true,
+          formatter: (params:any) => Math.round(params.value * 10) / 10 + '%'
+        },
       },
       {
-        data: [count.warn],
+        data: [list.length ? 100 * count.warn/list.length : 0],
+        label: {
+          show: true,
+          formatter: (params:any) => Math.round(params.value * 10) / 10 + '%'
+        },
       },
       {
-        data: [count.normal],
+        data: [list.length ? 100 * count.normal/list.length : 0],
+        label: {
+          show: true,
+          formatter: (params:any) => Math.round(params.value * 10) / 10 + '%'
+        },
       },
       {
-        data: [count.reair],
+        data: [list.length ? 100 * count.repair/list.length : 0],
+        label: {
+          show: true,
+          formatter: (params:any) => Math.round(params.value * 10) / 10 + '%'
+        },
       },
       {
-        data: [count.other],
+        data: [list.length ? 100 * count.other/list.length : 0],
+        label: {
+          show: true,
+          formatter: (params:any) => Math.round(params.value * 10) / 10 + '%'
+        },
       },
     ],
   });
@@ -318,7 +338,7 @@ export const showStateChart = (div:string, list:any) => {
 }
 
 const makeAIChart = (div:string) => {
-  chart = echarts.init(document.getElementById(div),"dark");
+  chart = echarts.init(document.getElementById(div),isDark() ? "dark" : "");
   const option = {
     title: {
       show: false,
@@ -329,17 +349,13 @@ const makeAIChart = (div:string) => {
         type: 'shadow',
       },
     },
-    grid: {
-      left: '3%',
-      right: '4%',
-      bottom: '3%',
-      containLabel: true
-    },
     xAxis: {
       type: 'value',
+      show:false,
     },
     yAxis: {
       type: 'category',
+      show: false,
       data: ['']
     },
     series: [
@@ -377,7 +393,7 @@ const makeAIChart = (div:string) => {
     legend: {
       textStyle: {
         fontSize: 8,
-        color: '#ccc',
+        color: isDark() ? '#ccc' : '#333',
       },
       data: ["重度","軽度","注意","正常"],
     },
@@ -399,7 +415,6 @@ export const showAIChart = (div:string, list:any) => {
     normal: 0,
   }
   list.forEach((e:any) => {
-    const s = "normal";
     if(e.Score > 66 ) {
       count.high++;
     } else if (e.Score > 58 ) {
@@ -409,25 +424,200 @@ export const showAIChart = (div:string, list:any) => {
     } else {
       count.normal++;
     }
-    count[s]++;
   })
   chart.setOption({
     series: [
       {
-        data: [count.high],
+        data: [list.length ? 100 * count.high/list.length : 0],
+        label: {
+          show: true,
+          formatter: (params:any) => Math.round(params.value * 10) / 10 + '%'
+        },
       },
       {
-        data: [count.low],
+        data: [list.length ? 100 * count.low/list.length : 0],
+        label: {
+          show: true,
+          formatter: (params:any) => Math.round(params.value * 10) / 10 + '%'
+        },
       },
       {
-        data: [count.warn],
+        data: [list.length ? 100 * count.warn/list.length : 0],
+        label: {
+          show: true,
+          formatter: (params:any) => Math.round(params.value * 10) / 10 + '%'
+        },
       },
       {
-        data: [count.normal],
+        data: [list.length ? 100 * count.normal/list.length : 0],
+        label: {
+          show: true,
+          formatter: (params:any) => Math.round(params.value * 10) / 10 + '%'
+        },
       },
     ],
   });
   chart.resize();
+}
+
+export const showAIHeatMap = (div:string, scores:any) => {
+  if (chart) {
+    chart.dispose()
+  }
+  chart = echarts.init(document.getElementById(div),isDark() ? "dark" : "");
+  const hours = [
+    '0',
+    '1',
+    '2',
+    '3',
+    '4',
+    '5',
+    '6',
+    '7',
+    '8',
+    '9',
+    '10',
+    '11',
+    '12',
+    '13',
+    '14',
+    '15',
+    '16',
+    '17',
+    '18',
+    '19',
+    '20',
+    '21',
+    '22',
+    '23',
+  ]
+  const option = {
+    title: {
+      show: false,
+    },
+    grid: {
+      left: '5%',
+      right: '10%',
+      containLabel: true,
+      top: "10%",
+      buttom: '5%',
+    },
+    tooltip: {
+      trigger: 'item',
+      formatter(params:any) {
+        return (
+          params.name +
+          ' ' +
+          params.data[1] +
+          ' : ' +
+          params.data[2].toFixed(1)
+        )
+      },
+      axisPointer: {
+        type: 'shadow',
+      },
+    },
+    xAxis: {
+      type: 'category',
+      name: "日付",
+      nameTextStyle: {
+        color: isDark() ? '#ccc' : '#333',
+        fontSize: 8,
+        margin: 2,
+      },
+      axisLabel: {
+        color: isDark() ? '#ccc' : '#333',
+        fontSize: 8,
+        margin: 2,
+      },
+      axisLine: {
+        lineStyle: {
+          color: isDark() ? '#ccc' : '#333',
+        },
+      },
+      data: [] as any[],
+    },
+    yAxis: {
+      type: 'category',
+      name: "時間帯",
+      nameTextStyle: {
+        color: isDark() ? '#ccc' : '#333',
+        fontSize: 8,
+        margin: 2,
+      },
+      axisLabel: {
+        color: isDark() ? '#ccc' : '#333',
+        fontSize: 8,
+        margin: 2,
+      },
+      axisLine: {
+        lineStyle: {
+          color: isDark() ? '#ccc' : '#333',
+        },
+      },
+      data: hours,
+    },
+    visualMap: {
+      show:false,
+      min: 40,
+      max: 80,
+      textStyle: {
+        color: isDark() ? '#ccc' : '#333',
+        fontSize: 8,
+      },
+      calculable: true,
+      realtime: false,
+      inRange: {
+        color: [
+          '#313695',
+          '#4575b4',
+          '#74add1',
+          '#abd9e9',
+          '#e0f3f8',
+          '#ffffbf',
+          '#fee090',
+          '#fdae61',
+          '#f46d43',
+          '#d73027',
+          '#a50026',
+        ],
+      },
+    },
+    series: [
+      {
+        name: 'Score',
+        type: 'heatmap',
+        data: [] as any[],
+        emphasis: {
+          itemStyle: {
+            borderColor: isDark() ? '#ccc' : '#333',
+            borderWidth: 1,
+          },
+        },
+        progressive: 1000,
+        animation: false,
+      },
+    ],
+  }
+  if (!scores) {
+    chart.setOption(option)
+    chart.resize()
+    return
+  }
+  let nD = 0
+  let x = -1
+  scores.forEach((e:any) => {
+    const t = new Date(e[0] * 1000)
+    if (nD !== t.getDate()) {
+      option.xAxis.data.push(echarts.time.format(t, '{MM}/{dd}',false))
+      nD = t.getDate()
+      x++
+    }
+    option.series[0].data.push([x, t.getHours(), e[1]])
+  })
+  chart.setOption(option);
+  chart.resize();
+  return chart;
 }
 
 
@@ -437,3 +627,7 @@ export const resizeChart = () => {
   }
 }
 
+const isDark = (): boolean => {
+  const e = document.querySelector("html");
+  return e != null && e.classList.contains("dark");
+};

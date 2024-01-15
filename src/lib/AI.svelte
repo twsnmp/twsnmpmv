@@ -7,7 +7,8 @@
   import {api,renderScore,renderTime} from "./map";
   import ja from "datatables.net-plugins/i18n/ja.json";
   import { tick } from "svelte";
-  import {showAIChart,resizeChart} from "./chart";
+  import {showAIChart,showAIHeatMap,resizeChart} from "./chart";
+  import "../assets/jquery.dataTables.css";
 
   export let show = false;
   let table :any = undefined;
@@ -28,12 +29,35 @@
       paging: false,
       searching:false,
       info:false,
-      scrollY: "50vh",
+      scrollY: "40vh",
       scrollX: true,
       language: ja,
-      order: [[0, "asc"]],
+      select: {
+        style: "single",
+      },
+      order: [[0, "desc"]],
+    });
+    table.on("select", () => {
+      const ids = table.rows({ selected: true }).data().pluck("ID");
+      if (ids.length == 1) {
+        showHeatMap(ids[0]);
+      }
+    });
+    table.on("deselect", () => {
+      showAIChart("chart",data);
     });
   };
+
+  const showHeatMap = async (id:string) => {
+    if(!api || !id) {
+      return;
+    }
+    const air = await api.get("/api/report/ai/" +id);
+    console.log(air);
+    if(air && air.AIResult) {
+      showAIHeatMap("chart",air.AIResult.ScoreData);
+    }
+  }
 
 
   const columns = [
@@ -69,7 +93,6 @@
     for(const a of ai) {
       data.push(a);
     }
-    console.log(data);
     await tick();
     showTable();
     showAIChart("chart",data);
@@ -104,7 +127,7 @@
   }
   #chart {
     width: 98%;
-    height: 20vh;
+    height: 30vh;
     margin: 0 auto;
   }
 </style>
