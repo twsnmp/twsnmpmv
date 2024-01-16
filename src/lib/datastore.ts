@@ -17,6 +17,7 @@ export interface TwsnmpEnt  {
 export class DataStore {
   list :TwsnmpEnt[]
   stateMap: Map<string,string>
+  apiMap: Map<string,any>
   timer: any
   checkIndex: number
   constructor () {
@@ -24,6 +25,7 @@ export class DataStore {
     this.load();
     this.stateMap = new Map();
     this.checkIndex = 0;
+    this.apiMap = new Map();
   }
   // 読み込み
   async load() {
@@ -45,6 +47,8 @@ export class DataStore {
   public async save(t :TwsnmpEnt) {
     if(t.id) {
       this.list = this.list.filter((e)=> e.id != t.id);
+      this.apiMap.delete(t.id);
+      this.stateMap.delete(t.id);
     } else {
       t.id = uuidv4();
     }
@@ -62,6 +66,8 @@ export class DataStore {
     this.list = this.list.filter((e)=> e.id != id);
     await Preferences.configure({group:"twsnmpmv"});
     await Preferences.remove({key:id});
+    this.apiMap.delete(id);
+    this.stateMap.delete(id);
     refreshCount.update(n=>n+1);
   }
   // 取得
@@ -82,14 +88,27 @@ export class DataStore {
   }
   async checkOneSite(i:number) {
     const t = this.list[i];
-    const api = new TwsnmpAPI(t.url);
-    if(!await api.login(t.user,t.password) ) {
-      this.stateMap.set(t.id,"unknown");
-      refreshCount.update(n=>n+1);
-      return;
-    }
     let state = "unknown";
-    const nodes = await api.get("/api/nodes");
+    let nodes: any;
+    for(let i = 0;i < 2;i++) {
+      let api :any;
+      if ( this.apiMap.has(t.id)) {
+        api = this.apiMap.get(t.id);
+      } else {
+        api = new TwsnmpAPI(t.url);
+        if(!await api.login(t.user,t.password) ) {
+          this.stateMap.set(t.id,"unknown");
+          refreshCount.update(n=>n+1);
+          return;
+        }
+        this.apiMap.set(t.id,api);
+      }
+      nodes = await api.get("/api/nodes");
+      if(nodes != undefined) {
+        break
+      }
+      this.apiMap.delete(t.id);
+    }
     if(nodes && nodes.length >0 ) {
       for(const n of nodes) {
         if(n.State == "high") {
@@ -118,14 +137,14 @@ export class DataStore {
       this.timer = undefined;
       return;
     }
+    this.checkOneSite(this.checkIndex);
+    this.checkIndex++;
     if (this.checkIndex >= this.list.length) {
       this.checkIndex = 0;
       if (this.list.length < 60) {
         t = 60 - this.list.length;
       }
     }
-    this.checkOneSite(this.checkIndex);
-    this.checkIndex++;
     this.timer = setTimeout(()=>this.checkSite(),t * 1000);
   }
   stopSiteCheck() {

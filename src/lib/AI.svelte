@@ -53,7 +53,6 @@
       return;
     }
     const air = await api.get("/api/report/ai/" +id);
-    console.log(air);
     if(air && air.AIResult) {
       showAIHeatMap("chart",air.AIResult.ScoreData);
     }
@@ -89,7 +88,6 @@
   const onOpen = async () => {
     data = [];
     const ai = await api.get("/api/report/ailist");
-    console.log(ai);
     for(const a of ai) {
       data.push(a);
     }

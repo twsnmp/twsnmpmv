@@ -24,7 +24,7 @@ const makeLogChart = (div:string) => {
       type: 'time',
       name: "日時",
       axisLabel: {
-        color: '#ccc',
+        color: isDark() ? '#ccc' : '#333',
         fontSize: '8px',
         formatter: (value:any, index:any) => {
           const date = new Date(value)
@@ -32,13 +32,13 @@ const makeLogChart = (div:string) => {
         },
       },
       nameTextStyle: {
-        color: '#ccc',
+        color: isDark() ? '#ccc' : '#333',
         fontSize: 8,
         margin: 2,
       },
       axisLine: {
         lineStyle: {
-          color: '#ccc',
+          color: isDark() ? '#ccc' : '#333',
         },
       },
       splitLine: {
@@ -49,17 +49,17 @@ const makeLogChart = (div:string) => {
       type: 'value',
       name: "件数",
       nameTextStyle: {
-        color: '#ccc',
+        color: isDark() ? '#ccc' : '#333',
         fontSize: 8,
         margin: 2,
       },
       axisLine: {
         lineStyle: {
-          color: '#ccc',
+          color: isDark() ? '#ccc' : '#333',
         },
       },
       axisLabel: {
-        color: '#ccc',
+        color: isDark() ? '#ccc' : '#333',
         fontSize: 8,
         margin: 2,
       },
@@ -205,11 +205,11 @@ const makeStateChart = (div:string) => {
     },
     xAxis: {
       type: 'value',
-      show:false,
+      show: false,
     },
     yAxis: {
       type: 'category',
-      show:false,
+      show: false,
       data: ['']
     },
     series: [
@@ -218,7 +218,6 @@ const makeStateChart = (div:string) => {
         type: 'bar',
         color: '#e31a1c',
         stack: 'count',
-        large: true,
         data: [],
       },
       {
@@ -226,7 +225,6 @@ const makeStateChart = (div:string) => {
         type: 'bar',
         color: '#fb9a99',
         stack: 'count',
-        large: true,
         data: [],
       },
       {
@@ -364,7 +362,6 @@ const makeAIChart = (div:string) => {
         type: 'bar',
         color: '#e31a1c',
         stack: 'count',
-        large: true,
         data: [],
       },
       {
@@ -372,7 +369,6 @@ const makeAIChart = (div:string) => {
         type: 'bar',
         color: '#fb9a99',
         stack: 'count',
-        large: true,
         data: [],
       },
       {
