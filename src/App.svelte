@@ -6,9 +6,11 @@
   import List from "./lib/List.svelte";
   import Location from "./lib/Location.svelte";
   import Map from "./lib/Map.svelte";
+  import Settings from "./lib/Settings.svelte";
 
   let page = "list";
   let showEditSite = false;
+  let showSettings = false;
   let selected = "";
 
   const open = (e: CustomEvent<{ id: string }>) => {
@@ -66,6 +68,7 @@
       btnName="設定"
       appBtnPosition="middle"
       btnClass="text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-500"
+      on:click={()=>{page="list";showSettings = true}}
     >
       <Icon path={icons.mdiCog} size={1.5} />
       <Tooltip arrow={false}>設定</Tooltip>
@@ -81,3 +84,5 @@
   bind:show={showEditSite}
   twsnmp={{ id: "", name: "New", url: "", user: "", password: "", loc: "" }}
 ></EditSite>
+
+<Settings bind:show={showSettings}></Settings>

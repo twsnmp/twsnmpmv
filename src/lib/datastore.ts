@@ -92,6 +92,9 @@ export class DataStore {
 
   // 保存
   public async saveLocConf() {
+    if (!this.locConf.style) {
+      this.locConf.style = "https://tile.openstreetmap.jp/styles/osm-bright-ja/style.json";
+    }
     const v = JSON.stringify(this.locConf);
     await Preferences.configure({group:"twsnmpmv_conf"});
     await Preferences.set({key:"locConf",value:v});
