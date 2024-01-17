@@ -4,6 +4,7 @@
   import * as icons from "@mdi/js";
   import EditSite from "./lib/EditSite.svelte";
   import List from "./lib/List.svelte";
+  import Location from "./lib/Location.svelte";
   import Map from "./lib/Map.svelte";
 
   let page = "list";
@@ -19,6 +20,8 @@
 
 {#if page == "list"}
   <List on:open={open}></List>
+{:else if page =="loc"}
+  <Location></Location>
 {:else if page == "map"}
   <Map id={selected} on:close={() => page="list"}></Map>
 {/if}

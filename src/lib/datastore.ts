@@ -14,14 +14,26 @@ export interface TwsnmpEnt  {
   loc: string;
 }
 
+export interface LocConfEnt {
+  style: string
+  zoom: number
+  center: string
+}
+
 export class DataStore {
   list :TwsnmpEnt[]
   stateMap: Map<string,string>
   apiMap: Map<string,any>
   timer: any
   checkIndex: number
+  locConf: LocConfEnt
   constructor () {
     this.list = [];
+    this.locConf = {
+      style: "https://tile.openstreetmap.jp/styles/osm-bright-ja/style.json",
+      zoom:2,
+      center:"139.75,35.68"
+    }
     this.load();
     this.stateMap = new Map();
     this.checkIndex = 0;
@@ -39,6 +51,11 @@ export class DataStore {
       }
       const e = JSON.parse(v.value);
       this.list.push(e);
+    }
+    await Preferences.configure({group:"twsnmpmv_conf"});
+    const lcv = await Preferences.get({key:"locConf"});
+    if( lcv && lcv.value) {
+      this.locConf = JSON.parse(lcv.value);
     }
     refreshCount.update(n=>n+1);
     this.checkSite();
@@ -60,6 +77,24 @@ export class DataStore {
     if(this.list.length == 1) {
       this.checkSite();
     }
+  }
+
+  public async saveLoc(t :TwsnmpEnt) {
+    if(!t.id) {
+      return;
+    }
+    this.list = this.list.filter((e)=> e.id != t.id);
+    this.list.push(t);
+    const v = JSON.stringify(t);
+    await Preferences.configure({group:"twsnmpmv"});
+    await Preferences.set({key:t.id,value:v});
+  }
+
+  // 保存
+  public async saveLocConf() {
+    const v = JSON.stringify(this.locConf);
+    await Preferences.configure({group:"twsnmpmv_conf"});
+    await Preferences.set({key:"locConf",value:v});
   }
   // 削除
   async del(id :string) {
