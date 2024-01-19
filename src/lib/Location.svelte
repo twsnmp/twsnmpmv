@@ -101,12 +101,5 @@
 
 </script>
 
-<div id="map" />
+<div id="map" class="w-full h-full"/>
 
-<style>
-  #map {
-    height: 90vh;
-    width: 98vw;
-    margin: 0 auto;
-  }
-</style>

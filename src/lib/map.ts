@@ -3,8 +3,8 @@ import { type TwsnmpEnt } from "./datastore";
 import { TwsnmpAPI } from "./twsnmpapi";
 import * as echarts from 'echarts';
 
-const MAP_SIZE_X = window.screen.width > 4000 ? 5000 : 2500;
-const MAP_SIZE_Y = 5000;
+const MAP_SIZE_X = 2000;
+const MAP_SIZE_Y = 2000;
 
 let mapRedraw = true;
 

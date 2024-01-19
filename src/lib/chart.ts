@@ -8,33 +8,22 @@ const makeLogChart = (div:string) => {
     title: {
       show: false,
     },
-    tooltip: {
-      trigger: 'axis',
-      axisPointer: {
-        type: 'shadow',
-      },
-    },
     grid: {
-      left: '5%',
-      right: '10%',
-      top: 40,
-      buttom: 0,
+      left: 20,
+      right: 10,
+      top: 20,
+      bottom: 20,
     },
     xAxis: {
       type: 'time',
-      name: "日時",
       axisLabel: {
         color: isDark() ? '#ccc' : '#333',
-        fontSize: '8px',
+        fontSize: '6px',
+        rotate: 10,
         formatter: (value:any, index:any) => {
           const date = new Date(value)
           return echarts.time.format(date, '{MM}/{dd} {HH}:{mm}',false)
         },
-      },
-      nameTextStyle: {
-        color: isDark() ? '#ccc' : '#333',
-        fontSize: 8,
-        margin: 2,
       },
       axisLine: {
         lineStyle: {
@@ -47,12 +36,6 @@ const makeLogChart = (div:string) => {
     },
     yAxis: {
       type: 'value',
-      name: "件数",
-      nameTextStyle: {
-        color: isDark() ? '#ccc' : '#333',
-        fontSize: 8,
-        margin: 2,
-      },
       axisLine: {
         lineStyle: {
           color: isDark() ? '#ccc' : '#333',
@@ -98,13 +81,6 @@ const makeLogChart = (div:string) => {
         data: [],
       },
     ],
-    legend: {
-      textStyle: {
-        fontSize: 8,
-        color: isDark () ? '#ccc' : '#333',
-      },
-      data: ["重度","軽度","注意","その他"],
-    },
   }
   chart.setOption(option);
   chart.resize();
@@ -197,11 +173,11 @@ const makeStateChart = (div:string) => {
     title: {
       show: false,
     },
-    tooltip: {
-      trigger: 'axis',
-      axisPointer: {
-        type: 'shadow',
-      },
+    grid: {
+      left: 10,
+      right: 10,
+      top: 0,
+      bottom: 0,
     },
     xAxis: {
       type: 'value',
@@ -256,13 +232,6 @@ const makeStateChart = (div:string) => {
         data: [],
       },
     ],
-    legend: {
-      textStyle: {
-        fontSize: 8,
-        color: isDark() ? '#ccc' : '#333',
-      },
-      data: ["重度","軽度","注意","正常","復帰","その他"],
-    },
   }
   chart.setOption(option);
   chart.resize();
@@ -341,11 +310,11 @@ const makeAIChart = (div:string) => {
     title: {
       show: false,
     },
-    tooltip: {
-      trigger: 'axis',
-      axisPointer: {
-        type: 'shadow',
-      },
+    grid: {
+      left: 10,
+      right: 10,
+      top: 0,
+      bottom: 0,
     },
     xAxis: {
       type: 'value',
@@ -386,18 +355,10 @@ const makeAIChart = (div:string) => {
         data: [],
       },
     ],
-    legend: {
-      textStyle: {
-        fontSize: 8,
-        color: isDark() ? '#ccc' : '#333',
-      },
-      data: ["重度","軽度","注意","正常"],
-    },
   }
   chart.setOption(option);
   chart.resize();
 }
-
 
 export const showAIChart = (div:string, list:any) => {
   if (chart) {
@@ -492,35 +453,13 @@ export const showAIHeatMap = (div:string, scores:any) => {
       show: false,
     },
     grid: {
-      left: '5%',
-      right: '10%',
-      containLabel: true,
-      top: "10%",
-      buttom: '5%',
-    },
-    tooltip: {
-      trigger: 'item',
-      formatter(params:any) {
-        return (
-          params.name +
-          ' ' +
-          params.data[1] +
-          ' : ' +
-          params.data[2].toFixed(1)
-        )
-      },
-      axisPointer: {
-        type: 'shadow',
-      },
+      left: 20,
+      right: 10,
+      top: 10,
+      bottom: 20,
     },
     xAxis: {
       type: 'category',
-      name: "日付",
-      nameTextStyle: {
-        color: isDark() ? '#ccc' : '#333',
-        fontSize: 8,
-        margin: 2,
-      },
       axisLabel: {
         color: isDark() ? '#ccc' : '#333',
         fontSize: 8,
@@ -535,12 +474,6 @@ export const showAIHeatMap = (div:string, scores:any) => {
     },
     yAxis: {
       type: 'category',
-      name: "時間帯",
-      nameTextStyle: {
-        color: isDark() ? '#ccc' : '#333',
-        fontSize: 8,
-        margin: 2,
-      },
       axisLabel: {
         color: isDark() ? '#ccc' : '#333',
         fontSize: 8,

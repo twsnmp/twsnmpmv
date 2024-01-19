@@ -28,7 +28,7 @@
       paging: false,
       searching:false,
       info:false,
-      scrollY: "50vh",
+      scrollY: "30vh",
       scrollX: true,
       language: ja,
       order: [[1, "desc"]],
@@ -61,7 +61,6 @@
   ];
 
   const onOpen = async () => {
-    console.log("on open");
     data = [];
     if (!logs) {
       return;
@@ -105,7 +104,7 @@
   }
   #chart {
     width: 98%;
-    height: 20vh;
+    height: 30vh;
     margin: 0 auto;
   }
 </style>

@@ -29,7 +29,7 @@
       paging: false,
       searching:false,
       info:false,
-      scrollY: "40vh",
+      scrollY: "30vh",
       scrollX: true,
       language: ja,
       select: {
