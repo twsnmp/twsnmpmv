@@ -86,17 +86,18 @@ const makeLogChart = (div:string) => {
   chart.resize();
 }
 
-const addChartData = (data:any, count:number[], ctm:number, newCtm:number) => {
-  let t = new Date(ctm * 60 * 1000)
+const addChartData = (data:any, count:number[], cth:number, newCth:number) => {
+  let t = new Date(cth * 60 * 60 * 1000);
+  console.log(t);
   for (const k in count) {
     data[k].push({
       name: echarts.time.format(t, '{yyyy}/{MM}/{dd} {HH}:{mm}:{ss}',false),
       value: [t, count[k]],
     })
   }
-  ctm++
-  for (; ctm < newCtm; ctm++) {
-    t = new Date(ctm * 60 * 1000)
+  cth++
+  for (; cth < newCth; cth++) {
+    t = new Date(cth * 60 * 60 * 1000)
     for (const k in count) {
       data[k].push({
         name: echarts.time.format(t, '{yyyy}/{MM}/{dd} {HH}:{mm}:{ss}',false),
@@ -104,14 +105,15 @@ const addChartData = (data:any, count:number[], ctm:number, newCtm:number) => {
       })
     }
   }
-  return ctm
+  return cth
 }
 
 export const showLogChart = (div:string, logs:any) => {
   if (chart) {
     chart.dispose();
   }
-  makeLogChart(div)
+  makeLogChart(div);
+  logs.sort((a:any,b:any)=> a.Time - b.Time);
   const data:any = {
     high: [],
     low: [],
@@ -124,17 +126,17 @@ export const showLogChart = (div:string, logs:any) => {
     warn: 0,
     other: 0,
   }
-  let ctm : number = -1;
+  let cth : number = -1;
   let st = Infinity
   let lt = 0
   logs.forEach((e:any) => {
     const lvl = data[e.Level] ? e.Level : 'other'
-    const newCtm = Math.floor(e.Time / (1000 * 1000 * 1000 * 60))
-    if (ctm < 0) {
-      ctm = newCtm;
+    const newCth = Math.floor(e.Time / (1000 * 1000 * 1000 * 60 * 60))
+    if (cth < 0) {
+      cth = newCth;
     }
-    if (ctm !== newCtm) {
-      ctm = addChartData(data, count, ctm, newCtm);
+    if (cth !== newCth) {
+      cth = addChartData(data, count, cth, newCth);
       for (const k in count) {
         count[k] = 0;
       }
@@ -147,7 +149,7 @@ export const showLogChart = (div:string, logs:any) => {
       lt = e.Time;
     }
   })
-  addChartData(data, count, ctm, ctm + 1);
+  addChartData(data, count, cth, cth + 1);
   chart.setOption({
     series: [
       {
