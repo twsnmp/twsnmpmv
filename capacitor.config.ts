@@ -7,12 +7,16 @@ const config: CapacitorConfig = {
   appName: 'twsnmpmv',
   webDir: 'dist',
   server: {
-    androidScheme: 'https'
+    androidScheme: 'http',
+    cleartext: true,
   },
   ios: {
     scrollEnabled: true,
     contentInset: 'always',
     webContentsDebuggingEnabled: true,
+  },
+  android:{
+    allowMixedContent: true,
   },
   plugins: {
     Keyboard: {

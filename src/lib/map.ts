@@ -30,6 +30,22 @@ const imageMap = new Map();
 
 let _mapP5: P5 | undefined = undefined;
 export let api: TwsnmpAPI;
+let scale = 1.0;
+
+export const zoomMap = (zoomIn:boolean) => {
+  if(zoomIn) {
+    scale += 0.1;
+    if( scale > 3.0) {
+      scale = 3.0;
+    }
+  } else {
+    scale -= 0.1;
+    if(scale < 0.1) {
+      scale = 0.1;
+    }
+  }
+  mapRedraw = true;
+}
 
 export const initMAP = async (div: HTMLElement, twsnmp: TwsnmpEnt) => {
   _backImage = null;
@@ -150,6 +166,7 @@ const mapMain = (p5: P5) => {
       return;
     }
     mapRedraw = false;
+    p5.scale(scale);
     p5.background(dark ? 23 : 252);
     if (_backImage) {
       if (backImage.Width) {
@@ -298,6 +315,22 @@ const mapMain = (p5: P5) => {
       p5.pop();
     }
   };
+  p5.mouseWheel = (e:any) => {
+    e.preventDefault();
+    console.log(e);
+    if(e.delta > 0) {
+      scale += 0.1;
+      if(scale >2.0) {
+        scale = 2.0;
+      }
+    } else if (e.delta < 0) {
+      scale -=0.1;
+      if (scale < 0.3) {
+        scale = 0.3;
+      }
+    }
+    mapRedraw = true;
+  }
 };
 
 const stateMap = new Map();

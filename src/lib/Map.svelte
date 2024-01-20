@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { initMAP, updateMAP, deleteMap } from "./map";
+  import { initMAP, updateMAP, deleteMap, zoomMap } from "./map";
   import { onMount, onDestroy } from "svelte";
   import { BottomNav,BottomNavItem,Tooltip,DarkMode } from "flowbite-svelte";
   import * as icons from "@mdi/js";
@@ -48,6 +48,13 @@
     dispatch("close",{});
   }
 
+  const clearModal = () => {
+    showAI = false;
+    showLog = false;
+    showNode = false;
+    showPolling = false;
+  }
+
 </script>
 
 <div bind:this={map} class="h-full w-full overflow-scroll" />
@@ -55,56 +62,53 @@
 
 <BottomNav
 position="fixed"
-navType="application"
-classInner="grid-cols-6"
+classInner="grid-cols-8"
+size="sm"
 >
 <BottomNavItem
-  btnName="ログ"
-  on:click={() => showLog = true}
-  appBtnPosition="left"
+  on:click={() => {clearModal();showLog = true}}
   btnClass="text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-500"
 >
   <Icon path={icons.mdiListBox} size={2} />
-  <Tooltip arrow={false}>ログ</Tooltip>
 </BottomNavItem>
 <BottomNavItem
-  btnName="ノード"
-  on:click={() => showNode = true}
-  appBtnPosition="left"
+  on:click={() => {clearModal();showNode = true}}
   btnClass="text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-500"
 >
   <Icon path={icons.mdiLaptop} size={2} />
-  <Tooltip arrow={false}>ノード</Tooltip>
 </BottomNavItem>
 <BottomNavItem
-  btnName="ポーリング"
-  on:click={() => showPolling = true}
-  appBtnPosition="middle"
+  on:click={() => {clearModal();showPolling = true}}
   btnClass="text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-500"
 >
   <Icon path={icons.mdiLanCheck} size={2} />
-  <Tooltip arrow={false}>ポーリング</Tooltip>
 </BottomNavItem>
 <BottomNavItem
-  btnName="AI分析"
-  on:click={() => showAI = true}
-  appBtnPosition="middle"
+  on:click={() => {clearModal();showAI = true}}
   btnClass="text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-500"
 >
   <Icon path={icons.mdiBrain} size={2} />
-  <Tooltip arrow={false}>AI分析</Tooltip>
 </BottomNavItem>
 <BottomNavItem
-  btnName="バック"
   on:click={back}
-  appBtnPosition="right"
   btnClass="text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-500"
 >
   <Icon path={icons.mdiClose} color="red" size={2} />
 </BottomNavItem>
-<BottomNavItem btnName="ダーク" appBtnPosition="right">
+<BottomNavItem
+  on:click={()=>zoomMap(true)}
+  btnClass="text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-500"
+>
+  <Icon path={icons.mdiMagnifyPlus} size={2} />
+</BottomNavItem>
+<BottomNavItem
+  on:click={()=>zoomMap(false)}
+  btnClass="text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-500"
+>
+  <Icon path={icons.mdiMagnifyMinus} size={2} />
+</BottomNavItem>
+<BottomNavItem>
   <DarkMode />
-  <Tooltip arrow={false}>ダーク</Tooltip>
 </BottomNavItem>
 </BottomNav>
 
