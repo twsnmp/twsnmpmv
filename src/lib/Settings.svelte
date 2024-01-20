@@ -23,13 +23,13 @@
 
 </script>
 
-<Modal bind:open={show} size="lg" dismissable={false} class="w-full" on:open={onOpen}>
-  <form class="flex flex-col space-y-4" action="#">
+<Modal bind:open={show} size="md" dismissable={false} on:open={onOpen}>
+  <form class="flex flex-col space-y-2" action="#">
     <Label class="space-y-2">
       <span>地図スタイル</span>
-      <Input bind:value={style} />
+      <Input type="url" bind:value={style} size="sm" />
     </Label>
-    <div class="flex justify-end space-x-2 mr-2">
+    <div class="flex justify-end space-x-2">
       <GradientButton
         shadow
         color="blue"
@@ -37,7 +37,7 @@
         class="!p-2"
         on:click={save}
       >
-        <Icon path={icons.mdiContentSave} size={2} />
+        <Icon path={icons.mdiContentSave} size={1} />
       </GradientButton>
       <GradientButton
         shadow
@@ -46,7 +46,7 @@
         class="!p-2"
         on:click={close}
       >
-        <Icon path={icons.mdiCancel} size={2} />
+        <Icon path={icons.mdiCancel} size={1} />
       </GradientButton>
     </div>
   </form>

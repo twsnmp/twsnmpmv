@@ -18,26 +18,24 @@
 
 </script>
 
-<Modal bind:open={show} size="lg" dismissable={false} class="w-full">
-  <form class="flex flex-col space-y-4" action="#">
-    <Label class="space-y-2">
+<Modal bind:open={show} size="md" dismissable={false} >
+  <form class="flex flex-col space-y-2" action="#">
+    <Label class="space-y-1">
       <span>サイト名</span>
-      <Input bind:value={twsnmp.name} />
+      <Input bind:value={twsnmp.name} size="sm" />
     </Label>
-    <Label class="space-y-2">
+    <Label class="space-y-1">
       <span>URL</span>
-      <Input bind:value={twsnmp.url} />
+      <Input type="url" bind:value={twsnmp.url} size="sm" />
     </Label>
-    <div class="flex justify-start space-x-2">
-      <Label class="space-y-2">
-        <span>ユーザー名</span>
-        <Input bind:value={twsnmp.user} />
-      </Label>
-      <Label class="space-y-2">
-        <span>パスワード</span>
-        <Input type="password" bind:value={twsnmp.password} />
-      </Label>
-    </div>
+    <Label class="space-y-1">
+      <span>ユーザー名</span>
+      <Input bind:value={twsnmp.user} size="sm" />
+    </Label>
+    <Label class="space-y-1">
+      <span>パスワード</span>
+      <Input type="password" bind:value={twsnmp.password} size="sm"/>
+    </Label>
     <div class="flex justify-end space-x-2 mr-2">
       <GradientButton
         shadow
@@ -46,7 +44,7 @@
         class="!p-2"
         on:click={save}
       >
-        <Icon path={icons.mdiContentSave} size={2} />
+        <Icon path={icons.mdiContentSave} size={1} />
       </GradientButton>
       <GradientButton
         shadow
@@ -55,7 +53,7 @@
         class="!p-2"
         on:click={close}
       >
-        <Icon path={icons.mdiCancel} size={2} />
+        <Icon path={icons.mdiCancel} size={1} />
       </GradientButton>
     </div>
   </form>
