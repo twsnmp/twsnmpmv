@@ -88,7 +88,6 @@ const makeLogChart = (div:string) => {
 
 const addChartData = (data:any, count:number[], cth:number, newCth:number) => {
   let t = new Date(cth * 60 * 60 * 1000);
-  console.log(t);
   for (const k in count) {
     data[k].push({
       name: echarts.time.format(t, '{yyyy}/{MM}/{dd} {HH}:{mm}:{ss}',false),

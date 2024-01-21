@@ -317,7 +317,6 @@ const mapMain = (p5: P5) => {
   };
   p5.mouseWheel = (e:any) => {
     e.preventDefault();
-    console.log(e);
     if(e.delta > 0) {
       scale += 0.1;
       if(scale >2.0) {
