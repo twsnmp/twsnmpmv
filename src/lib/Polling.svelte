@@ -97,7 +97,7 @@
         class="!p-2"
         on:click={close}
       >
-        <Icon path={icons.mdiCancel} size={1} />
+        <Icon path={icons.mdiCancel} size={1.5} />
       </GradientButton>
     </div>
   </div>

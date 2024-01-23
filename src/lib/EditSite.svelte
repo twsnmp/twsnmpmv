@@ -44,7 +44,7 @@
         class="!p-2"
         on:click={save}
       >
-        <Icon path={icons.mdiContentSave} size={1} />
+        <Icon path={icons.mdiContentSave} size={1.5} />
       </GradientButton>
       <GradientButton
         shadow
@@ -53,7 +53,7 @@
         class="!p-2"
         on:click={close}
       >
-        <Icon path={icons.mdiCancel} size={1} />
+        <Icon path={icons.mdiCancel} size={1.5} />
       </GradientButton>
     </div>
   </form>
