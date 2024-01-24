@@ -15,7 +15,6 @@
     "@fontsource/roboto": "^5.0.8",
     "@mdi/font": "^5.9.55",
     "@mdi/js": "^7.4.47",
-    "@novacbn/svelte-codejar": "^0.1.2",
     "@sveltejs/vite-plugin-svelte": "^3.0.1",
     "@tsconfig/svelte": "^5.0.2",
     "@types/numeral": "^2.0.5",
