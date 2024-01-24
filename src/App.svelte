@@ -7,16 +7,22 @@
   import Location from "./lib/Location.svelte";
   import Map from "./lib/Map.svelte";
   import Settings from "./lib/Settings.svelte";
+  import type { TwsnmpEnt } from "./lib/datastore";
 
   let page = "list";
   let showEditSite = false;
   let showSettings = false;
   let selected = "";
+  let twsnmp: TwsnmpEnt;
 
   const open = (e: CustomEvent<{ id: string }>) => {
     selected = e.detail.id;
     page = "map";
   };
+  const add = () => {
+    twsnmp = { id: "", name: "New", url: "", user: "", password: "", loc: "" };
+    showEditSite = true;
+  }
 </script>
 
 {#if page == "list"}
@@ -49,7 +55,7 @@
     <div class="flex items-center justify-center">
       <BottomNavItem
         btnClass="inline-flex items-center justify-center w-10 h-10 font-medium bg-blue-600 rounded-full hover:bg-blue-700 group focus:ring-4 focus:ring-blue-300 focus:outline-none dark:focus:ring-blue-800 text-white"
-        on:click={() => (showEditSite = true)}
+        on:click={add}
       >
         <Icon path={icons.mdiPlus} size={2} />
       </BottomNavItem>
@@ -69,9 +75,6 @@
   </BottomNav>
 {/if}
 
-<EditSite
-  bind:show={showEditSite}
-  twsnmp={{ id: "", name: "New", url: "", user: "", password: "", loc: "" }}
-></EditSite>
+<EditSite bind:show={showEditSite} {twsnmp}></EditSite>
 
 <Settings bind:show={showSettings}></Settings>
