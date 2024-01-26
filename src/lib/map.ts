@@ -2,6 +2,7 @@ import P5 from "p5";
 import { type TwsnmpEnt } from "./datastore";
 import { TwsnmpAPI } from "./twsnmpapi";
 import * as echarts from 'echarts';
+import mdiFont  from "@mdi/font/fonts/materialdesignicons-webfont.ttf";
 
 const MAP_SIZE_X = 2000;
 const MAP_SIZE_Y = 2000;
@@ -145,9 +146,11 @@ const isDark = (): boolean => {
   return e != null && e.classList.contains("dark");
 };
 
-
 const mapMain = (p5: P5) => {
   let oldDark = false;
+  p5.preload = () => {
+    p5.loadFont(mdiFont);
+  }
   p5.setup = () => {
     const c = p5.createCanvas(MAP_SIZE_X, MAP_SIZE_Y) as any;
     if(c && c.canvas) {
