@@ -149,7 +149,14 @@ const isDark = (): boolean => {
 const mapMain = (p5: P5) => {
   let oldDark = false;
   p5.setup = () => {
-    const c = p5.createCanvas(MAP_SIZE_X, MAP_SIZE_Y);
+    const c = p5.createCanvas(MAP_SIZE_X, MAP_SIZE_Y) as any;
+    if(c && c.canvas) {
+      if( (c.canvas.width * c.canvas.height) > 16777216) {
+        console.log("resize canvas",c.canvas.width , c.canvas.height);
+        p5.resizeCanvas(1000,1000);
+        scale = 0.8;
+      }
+    }
     p5.push();
     p5.textFont("Material Design Icons");
     p5.textFont("Roboto");
