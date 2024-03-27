@@ -1,8 +1,9 @@
 import P5 from "p5";
 import { type TwsnmpEnt } from "./datastore";
 import { TwsnmpAPI } from "./twsnmpapi";
-import * as echarts from 'echarts';
-import mdiFont  from "@mdi/font/fonts/materialdesignicons-webfont.ttf";
+import * as echarts from "echarts";
+import mdiFont from "@mdi/font/fonts/materialdesignicons-webfont.ttf";
+import { gauge, bar, line } from "./drawitem";
 
 const MAP_SIZE_X = 2000;
 const MAP_SIZE_Y = 2000;
@@ -13,7 +14,7 @@ export let nodes: any = {};
 export let lines: any = [];
 export let items: any = {};
 export let pollings: any = {};
-export let logs:  any = {};
+export let logs: any = {};
 
 let backImage: any = {
   X: 0,
@@ -33,20 +34,20 @@ let _mapP5: P5 | undefined = undefined;
 export let api: TwsnmpAPI;
 let scale = 1.0;
 
-export const zoomMap = (zoomIn:boolean) => {
-  if(zoomIn) {
+export const zoomMap = (zoomIn: boolean) => {
+  if (zoomIn) {
     scale += 0.1;
-    if( scale > 3.0) {
+    if (scale > 3.0) {
       scale = 3.0;
     }
   } else {
     scale -= 0.1;
-    if(scale < 0.1) {
+    if (scale < 0.1) {
       scale = 0.1;
     }
   }
   mapRedraw = true;
-}
+};
 
 export const initMAP = async (div: HTMLElement, twsnmp: TwsnmpEnt) => {
   _backImage = null;
@@ -69,7 +70,7 @@ export const initMAP = async (div: HTMLElement, twsnmp: TwsnmpEnt) => {
   _mapP5 = new P5(mapMain, div);
 };
 
-let oldBackImagePath = ""; 
+let oldBackImagePath = "";
 
 export const updateMAP = async () => {
   const dark = isDark();
@@ -86,21 +87,26 @@ export const updateMAP = async () => {
   logs = map.Logs;
   backImage = map.MapConf.BackImage;
 
-  if (backImage && backImage.Path && oldBackImagePath != backImage.Path && _mapP5 != undefined) {
+  if (
+    backImage &&
+    backImage.Path &&
+    oldBackImagePath != backImage.Path &&
+    _mapP5 != undefined
+  ) {
     oldBackImagePath = backImage.Path;
     _backImage = null;
-    _mapP5.loadImage(await api.get("/backimage","data"), (img) => {
+    _mapP5.loadImage(await api.get("/backimage", "data"), (img) => {
       _backImage = img;
       mapRedraw = true;
     });
-  } else if(_backImage && !backImage.Path){
+  } else if (_backImage && !backImage.Path) {
     _backImage = null;
   }
   for (const k in items) {
     switch (items[k].Type) {
       case 3:
         if (!imageMap.has(items[k].ID) && _mapP5 != undefined) {
-          const tmp = await api.get("/image/" + items[k].Path,"data");
+          const tmp = await api.get("/image/" + items[k].Path, "data");
           _mapP5.loadImage(tmp, (img) => {
             imageMap.set(items[k].ID, img);
             mapRedraw = true;
@@ -120,6 +126,56 @@ export const updateMAP = async () => {
         items[k].W = items[k].Size * 10;
         if (items[k].Value < 0.001) {
           items[k].Value = 0.0;
+        }
+        break;
+      case 6: // New Gauge
+        items[k].W = items[k].H;
+        if (_mapP5) {
+          _mapP5.loadImage(
+            gauge(
+              items[k].Text || "",
+              items[k].Value || 0,
+              backImage.Color || 23
+            ),
+            (img) => {
+              imageMap.set(k, img);
+              mapRedraw = true;
+            }
+          );
+        }
+        break;
+      case 7: // Bar
+        items[k].W = items[k].H * 4;
+        if (_mapP5) {
+          _mapP5.loadImage(
+            bar(
+              items[k].Text || "",
+              items[k].Color || "white",
+              items[k].Value || 0,
+              backImage.Color || 23
+            ),
+            (img) => {
+              imageMap.set(k, img);
+              mapRedraw = true;
+            }
+          );
+        }
+        break;
+      case 8: // Line
+        items[k].W = items[k].H * 4;
+        if (_mapP5) {
+          _mapP5.loadImage(
+            line(
+              items[k].Text || "",
+              items[k].Color || "white",
+              items[k].Values || [],
+              backImage.Color || 23
+            ),
+            (img) => {
+              imageMap.set(k, img);
+              mapRedraw = true;
+            }
+          );
         }
         break;
     }
@@ -150,13 +206,13 @@ const mapMain = (p5: P5) => {
   let oldDark = false;
   p5.preload = () => {
     p5.loadFont(mdiFont);
-  }
+  };
   p5.setup = () => {
     const c = p5.createCanvas(MAP_SIZE_X, MAP_SIZE_Y) as any;
-    if(c && c.canvas) {
-      if( (c.canvas.width * c.canvas.height) > 16777216) {
-        console.log("resize canvas",c.canvas.width , c.canvas.height);
-        p5.resizeCanvas(1000,1000);
+    if (c && c.canvas) {
+      if (c.canvas.width * c.canvas.height > 16777216) {
+        console.log("resize canvas", c.canvas.width, c.canvas.height);
+        p5.resizeCanvas(1000, 1000);
         scale = 0.8;
       }
     }
@@ -292,7 +348,15 @@ const mapMain = (p5: P5) => {
           const x3 = x + (r2 / 2) * p5.sin(angle) - 5 * p5.cos(angle);
           const y3 = y - (r2 / 2) * p5.cos(angle) - 5 * p5.sin(angle);
           p5.triangle(x1, y1, x2, y2, x3, y3);
+          break;
         }
+        case 6: // New Gauge,Line,Bar
+        case 7:
+        case 8:
+          if (imageMap.has(k)) {
+            p5.image(imageMap.get(k), 0, 0, items[k].W, items[k].H)
+          }
+          break
       }
       p5.pop();
     }
@@ -325,32 +389,32 @@ const mapMain = (p5: P5) => {
       p5.pop();
     }
   };
-  p5.mouseWheel = (e:any) => {
+  p5.mouseWheel = (e: any) => {
     e.preventDefault();
-    if(e.delta > 0) {
+    if (e.delta > 0) {
       scale += 0.1;
-      if(scale >2.0) {
+      if (scale > 2.0) {
         scale = 2.0;
       }
     } else if (e.delta < 0) {
-      scale -=0.1;
+      scale -= 0.1;
       if (scale < 0.3) {
         scale = 0.3;
       }
     }
     mapRedraw = true;
-  }
+  };
 };
 
 const stateMap = new Map();
 
 const stateList = [
-  { color: "#e31a1c", value: "high", name:"重度",icon: "mdi-alert-circle" },
-  { color: "#fb9a99", value: "low" , name:"軽度",icon: "mdi-alert-circle"},
-  { color: "#dfdf22", value: "warn", name:"注意",icon: "mdi-alert" },
-  { color: "#33a02c", value: "normal",name:"正常",icon: "mdi-check-circle" },
-  { color: "#1f78b4", value: "repair",name:"復帰",icon: "mdi-autorenew" },
-  { color: "#1f78b4", value: "info" ,name:"情報",icon: "mdi-information"},
+  { color: "#e31a1c", value: "high", name: "重度", icon: "mdi-alert-circle" },
+  { color: "#fb9a99", value: "low", name: "軽度", icon: "mdi-alert-circle" },
+  { color: "#dfdf22", value: "warn", name: "注意", icon: "mdi-alert" },
+  { color: "#33a02c", value: "normal", name: "正常", icon: "mdi-check-circle" },
+  { color: "#1f78b4", value: "repair", name: "復帰", icon: "mdi-autorenew" },
+  { color: "#1f78b4", value: "info", name: "情報", icon: "mdi-information" },
 ];
 
 stateList.forEach((e: any) => {
@@ -366,43 +430,48 @@ export const getStateName = (state: string): string => {
 };
 
 export const getStateIcon = (state: string): string => {
-  return stateMap.has(state) ? stateMap.get(state).icon : "mdi-comment-question-outline";
+  return stateMap.has(state)
+    ? stateMap.get(state).icon
+    : "mdi-comment-question-outline";
 };
 
 export const iconList = [
-  {icon: 'mdi-desktop-mac',value: 'desktop',code: 0xF01C4,},
-  {icon: 'mdi-desktop-classic',value: 'desktop-classic',code: 0xF07C0,},
-  { icon: 'mdi-laptop', value: 'laptop' ,code: 0xF0322},
-  { icon: 'mdi-tablet-ipad', value: 'tablet' ,code:0xF04F8},
-  { icon: 'mdi-server', value: 'server' ,code: 0xF048B},
-  { icon: 'mdi-ip-network', value: 'hdd' ,code: 0xF0A60},
-  { icon: 'mdi-ip-network', value: 'ip' ,code: 0xF0A60},
-  { icon: 'mdi-lan', value: 'network' ,code: 0xF0317},
-  { icon: 'mdi-wifi', value: 'wifi' ,code: 0xF05A9},
-  { icon: 'mdi-cloud', value: 'cloud' ,code: 0xF015F },
-  { icon: 'mdi-printer', value: 'printer' ,code: 0xF042A},
-  { icon: 'mdi-cellphone', value: 'cellphone' ,code: 0xF011C},
-  { icon: 'mdi-router', value: 'router' ,code: 0xF11E2},
-  { icon: 'mdi-web', value: 'web' ,code: 0xF059F},
-  { icon: 'mdi-database', value: 'db' ,code: 0xF01BC},
-  { icon: 'mdi-router-wireless', value: 'mdi-router-wireless' ,code: 0xF0469},
-  { icon: 'mdi-router-network', value: 'mdi-router-network' ,code: 0xF1087},
-  { icon: 'mdi-security', value: 'mdi-security' ,code: 0xF0483},
-  { icon: 'mdi-desktop-tower', value: 'mdi-desktop-tower' ,code: 0xF01C5},
-  { icon: 'mdi-microsoft-windows', value: 'mdi-microsoft-windows' ,code: 0xF05B3},
-  { icon: 'mdi-linux', value: 'mdi-linux' ,code: 0xF033D},
-  { icon: 'mdi-raspberry-pi', value: 'mdi-raspberry-pi' ,code: 0xF043F},
-  { icon: 'mdi-mailbox', value: 'mdi-mailbox' ,code: 0xF06EE},
-  { icon: 'mdi-clock', value: 'mdi-clock' ,code: 0xF0954},
-  { icon: 'mdi-android', value: 'mdi-android' ,code: 0xF0032},
-  { icon: 'mdi-microsoft-azure', value: 'mdi-microsoft-azure' ,code: 0xF0805},
-  { icon: 'mdi-amazon', value: 'mdi-amazon' ,code: 0xF002D},
-  { icon: 'mdi-apple', value: 'mdi-apple' ,code: 0xF0035},
-  { icon: 'mdi-google', value: 'mdi-google' ,code: 0xF02AD},
-  { icon: 'mdi-disc-player', value: 'mdi-disc-player' ,code: 0xF0960},
-  { icon: 'mdi-layers-search', value: 'mdi-layers-search' ,code: 0xF1206},
- 
- ];
+  { icon: "mdi-desktop-mac", value: "desktop", code: 0xf01c4 },
+  { icon: "mdi-desktop-classic", value: "desktop-classic", code: 0xf07c0 },
+  { icon: "mdi-laptop", value: "laptop", code: 0xf0322 },
+  { icon: "mdi-tablet-ipad", value: "tablet", code: 0xf04f8 },
+  { icon: "mdi-server", value: "server", code: 0xf048b },
+  { icon: "mdi-ip-network", value: "hdd", code: 0xf0a60 },
+  { icon: "mdi-ip-network", value: "ip", code: 0xf0a60 },
+  { icon: "mdi-lan", value: "network", code: 0xf0317 },
+  { icon: "mdi-wifi", value: "wifi", code: 0xf05a9 },
+  { icon: "mdi-cloud", value: "cloud", code: 0xf015f },
+  { icon: "mdi-printer", value: "printer", code: 0xf042a },
+  { icon: "mdi-cellphone", value: "cellphone", code: 0xf011c },
+  { icon: "mdi-router", value: "router", code: 0xf11e2 },
+  { icon: "mdi-web", value: "web", code: 0xf059f },
+  { icon: "mdi-database", value: "db", code: 0xf01bc },
+  { icon: "mdi-router-wireless", value: "mdi-router-wireless", code: 0xf0469 },
+  { icon: "mdi-router-network", value: "mdi-router-network", code: 0xf1087 },
+  { icon: "mdi-security", value: "mdi-security", code: 0xf0483 },
+  { icon: "mdi-desktop-tower", value: "mdi-desktop-tower", code: 0xf01c5 },
+  {
+    icon: "mdi-microsoft-windows",
+    value: "mdi-microsoft-windows",
+    code: 0xf05b3,
+  },
+  { icon: "mdi-linux", value: "mdi-linux", code: 0xf033d },
+  { icon: "mdi-raspberry-pi", value: "mdi-raspberry-pi", code: 0xf043f },
+  { icon: "mdi-mailbox", value: "mdi-mailbox", code: 0xf06ee },
+  { icon: "mdi-clock", value: "mdi-clock", code: 0xf0954 },
+  { icon: "mdi-android", value: "mdi-android", code: 0xf0032 },
+  { icon: "mdi-microsoft-azure", value: "mdi-microsoft-azure", code: 0xf0805 },
+  { icon: "mdi-amazon", value: "mdi-amazon", code: 0xf002d },
+  { icon: "mdi-apple", value: "mdi-apple", code: 0xf0035 },
+  { icon: "mdi-google", value: "mdi-google", code: 0xf02ad },
+  { icon: "mdi-disc-player", value: "mdi-disc-player", code: 0xf0960 },
+  { icon: "mdi-layers-search", value: "mdi-layers-search", code: 0xf1206 },
+];
 
 const iconMap = new Map();
 const iconCodeMap = new Map();
@@ -413,84 +482,88 @@ iconList.forEach((e) => {
 });
 
 const getIconCode = (icon: string): number => {
-  return iconCodeMap.has(icon) ? iconCodeMap.get(icon) : String.fromCodePoint(0xf0a39);
+  return iconCodeMap.has(icon)
+    ? iconCodeMap.get(icon)
+    : String.fromCodePoint(0xf0a39);
 };
 
 const getIcon = (icon: string): number => {
-  return iconMap.get(icon) || 'mdi-comment-question-outline';
+  return iconMap.get(icon) || "mdi-comment-question-outline";
 };
 
-
-export const formatTime = (date:any, format:string) => {
+export const formatTime = (date: any, format: string) => {
   if (!format) {
-      format = '{yyyy}/{MM}/{dd} {HH}:{mm}:{ss}'
+    format = "{yyyy}/{MM}/{dd} {HH}:{mm}:{ss}";
   }
-  return echarts.time.format(date,format,false)
-}
+  return echarts.time.format(date, format, false);
+};
 
-export const renderTime = (t:number,type:string) => {
-  if(type=="sort") {
+export const renderTime = (t: number, type: string) => {
+  if (type == "sort") {
     return t;
   }
   if (t < 1) {
     return "";
   }
-  const d = new Date(t /(1000*1000));
-  return  formatTime(d,"");
-}
-
-export const renderState = (state:string,type:string) => {
-  if(type=="sort") {
-    return levelNum(state);
-  }
-  return `<span class="mdi ` +
-      getStateIcon(state) +
-      ` text-lg" style="color:` +
-      getStateColor(state) +
-      `;"></span><span class="ml-2">` +
-      getStateName(state) +
-      `</span>`;
+  const d = new Date(t / (1000 * 1000));
+  return formatTime(d, "");
 };
 
-export const renderNodeState = (state:string,type:string,n:any) => {
-  if(type=="sort") {
+export const renderState = (state: string, type: string) => {
+  if (type == "sort") {
+    return levelNum(state);
+  }
+  return (
+    `<span class="mdi ` +
+    getStateIcon(state) +
+    ` text-lg" style="color:` +
+    getStateColor(state) +
+    `;"></span><span class="ml-2">` +
+    getStateName(state) +
+    `</span>`
+  );
+};
+
+export const renderNodeState = (state: string, type: string, n: any) => {
+  if (type == "sort") {
     return levelNum(state);
   }
   const icon = n.Icon ? getIcon(n.Icon) : getStateIcon(state);
-  return `<span class="mdi ` +
-      icon +
-      ` text-xl" style="color:` +
-      getStateColor(state) +
-      `;"></span><span class="ml-2">` +
-      getStateName(state) +
-      `</span>`;
+  return (
+    `<span class="mdi ` +
+    icon +
+    ` text-xl" style="color:` +
+    getStateColor(state) +
+    `;"></span><span class="ml-2">` +
+    getStateName(state) +
+    `</span>`
+  );
 };
 
-export const renderIP = (ip:string,type:string) => {
-  if (type=="sort") {
-    return ip.split(".").reduce((int, v) => (Number(int) * 256  +Number(v)) + "");
+export const renderIP = (ip: string, type: string) => {
+  if (type == "sort") {
+    return ip.split(".").reduce((int, v) => Number(int) * 256 + Number(v) + "");
   }
   return ip;
-}
+};
 
+export const levelNum = (s: string): number => {
+  switch (s) {
+    case "high":
+      return 0;
+    case "low":
+      return 1;
+    case "warn":
+      return 2;
+    case "normal":
+      return 4;
+    case "repair":
+      return 3;
+  }
+  return 5;
+};
 
-export const  levelNum = (s :string) :number => {
-	switch (s) {
-	case "high":
-		return 0;
-	case "low":
-		return 1;
-	case "warn":
-		return 2;
-	case "normal":
-		return 4
-	case "repair":
-		return 3
-	}
-	return 5
-}
-
-export const renderScore = (score: number,type:string): any => {
+export const renderScore = (score: number, type: string): any => {
   if (type == "sort") {
     return score;
   }
@@ -505,24 +578,24 @@ export const renderScore = (score: number,type:string): any => {
   );
 };
 
-export const getScoreColor = (s:number) => {
+export const getScoreColor = (s: number) => {
   if (s > 66) {
-    return getStateColor('high')
+    return getStateColor("high");
   } else if (s >= 58) {
-    return getStateColor('low')
+    return getStateColor("low");
   } else if (s > 50) {
-    return getStateColor('warn')
+    return getStateColor("warn");
   }
-  return getStateColor('info')
-}
+  return getStateColor("info");
+};
 
-export const getScoreIcon = (s:number) => {
+export const getScoreIcon = (s: number) => {
   if (s > 66) {
-    return 'mdi-emoticon-dead-outline'
+    return "mdi-emoticon-dead-outline";
   } else if (s > 58) {
-    return 'mdi-emoticon-sad-outline'
+    return "mdi-emoticon-sad-outline";
   } else if (s > 50) {
-    return 'mdi-emoticon-sick-outline'
+    return "mdi-emoticon-sick-outline";
   }
-  return 'mdi-emoticon-excited-outline'
-}
+  return "mdi-emoticon-excited-outline";
+};

@@ -1,10 +1,10 @@
 PODS:
-  - Capacitor (5.6.0):
+  - Capacitor (5.7.4):
     - CapacitorCordova
-  - CapacitorCordova (5.6.0)
-  - CapacitorKeyboard (5.0.7):
+  - CapacitorCordova (5.7.4)
+  - CapacitorKeyboard (5.0.8):
     - Capacitor
-  - CapacitorPreferences (5.0.6):
+  - CapacitorPreferences (5.0.7):
     - Capacitor
 
 DEPENDENCIES:
@@ -24,10 +24,10 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/@capacitor/preferences"
 
 SPEC CHECKSUMS:
-  Capacitor: ebfc16cdb8116d04c101686b080342872da42d43
-  CapacitorCordova: 931b48fcdbc9bc985fc2f16cec9f77c794a27729
-  CapacitorKeyboard: ce5e01064cf57a2c05b32565310713b7fe6cc6f9
-  CapacitorPreferences: f03954bcb0ff09c792909e46bff88e3183c16b10
+  Capacitor: 4fe9adf012caceb4c71ffea2f1f4d005cdcbeea7
+  CapacitorCordova: a6e87fccc0307dee7aec1560ec9398485f2b0ce7
+  CapacitorKeyboard: aec619a578235c6ce279075009a2689c2cf5c42c
+  CapacitorPreferences: 77ac427e98db83bace772455f8ba447430382c4c
 
 PODFILE CHECKSUM: 5d6d7e54a7ab58056361f3c032d23a71150f0b20
 
