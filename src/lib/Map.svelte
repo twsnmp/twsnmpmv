@@ -24,7 +24,8 @@
   onMount(async () => {
     const twsnmp = ds.get(id)
     await initMAP(map, twsnmp);
-    refreshMap();
+    await updateMAP();
+    setTimeout(refreshMap,500);
   });
 
   onDestroy(() => {

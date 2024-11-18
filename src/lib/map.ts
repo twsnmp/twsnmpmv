@@ -211,7 +211,6 @@ const mapMain = (p5: P5) => {
     const c = p5.createCanvas(MAP_SIZE_X, MAP_SIZE_Y) as any;
     if (c && c.canvas) {
       if (c.canvas.width * c.canvas.height > 16777216) {
-        console.log("resize canvas", c.canvas.width, c.canvas.height);
         p5.resizeCanvas(1000, 1000);
         scale = 0.8;
       }
