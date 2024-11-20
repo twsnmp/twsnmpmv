@@ -4,6 +4,7 @@ import { TwsnmpAPI } from "./twsnmpapi";
 import * as echarts from "echarts";
 import mdiFont from "@mdi/font/fonts/materialdesignicons-webfont.ttf";
 import { gauge, bar, line } from "./drawitem";
+import portImageUrl from "../assets/port.png";
 
 const MAP_SIZE_X = 2000;
 const MAP_SIZE_Y = 2000;
@@ -13,6 +14,8 @@ let mapRedraw = true;
 export let nodes: any = {};
 export let lines: any = [];
 export let items: any = {};
+export let networks: any = {}
+
 export let pollings: any = {};
 export let logs: any = {};
 
@@ -24,6 +27,7 @@ let backImage: any = {
   Data: "",
 };
 let _backImage: any = undefined;
+let portImage : any = undefined;
 
 let fontSize = 10;
 let iconSize = 24;
@@ -55,6 +59,7 @@ export const initMAP = async (div: HTMLElement, twsnmp: TwsnmpEnt) => {
   nodes = {};
   lines = [];
   items = [];
+  networks = [];
   pollings = {};
   logs = [];
   api = new TwsnmpAPI(twsnmp.url);
@@ -83,6 +88,7 @@ export const updateMAP = async () => {
   nodes = map.Nodes;
   lines = map.Lines;
   items = map.Items;
+  networks = map.Networks;
   pollings = map.Pollings;
   logs = map.Logs;
   backImage = map.MapConf.BackImage;
@@ -101,6 +107,21 @@ export const updateMAP = async () => {
     });
   } else if (_backImage && !backImage.Path) {
     _backImage = null;
+  }
+  for (const k in nodes) {
+    if(nodes[k].Image && !imageMap.has(nodes[k].Image) && _mapP5) {
+      const tmp = await api.get("/imageIcon/" + nodes[k].Image, "data");
+      _mapP5.loadImage(tmp, (img) => {
+        imageMap.set(nodes[k].Image,img);
+        mapRedraw = true
+      });
+    }
+  }
+  if (_mapP5) {
+    _mapP5.loadImage(portImageUrl,(img) => {
+      portImage = img;
+      mapRedraw = true;
+    });
   }
   for (const k in items) {
     switch (items[k].Type) {
@@ -246,6 +267,45 @@ const mapMain = (p5: P5) => {
         p5.image(_backImage, backImage.X, backImage.Y);
       }
     }
+    for (const k in networks) {
+      p5.push()
+      p5.textAlign(p5.LEFT)
+      p5.translate(networks[k].X,networks[k].Y)
+      if (networks[k].Error !== "") {
+        p5.stroke('#cc3300')
+      } else {
+        p5.stroke('#999')
+      }
+      p5.fill('rgba(23,23,23,0.9)')
+      p5.rect(0,0,networks[k].W,networks[k].H)
+      p5.stroke('#999')
+      p5.textFont('Roboto')
+      p5.textSize(fontSize)
+      p5.fill('#eee')
+      p5.text(networks[k].Name,5, fontSize + 5)
+      if (networks[k].Ports.length < 1) {
+        if (networks[k].Error !== ""){
+          p5.fill('#cc3300')
+          p5.text(networks[k].Error,15,fontSize * 2 + 15)
+        } else {
+          p5.fill('#11ee00')
+          p5.text('Scanning...',15,fontSize * 2 + 15)
+        }
+      } else if (portImage) {
+        p5.textSize(6)
+        for(const p of networks[k].Ports) {
+          const x = p.X * 45 + 10
+          const y = p.Y * 55 + fontSize +15
+          p5.image(portImage,x, y ,40,40)
+          p5.fill(p.State === 'up' ? '#11ee00' : ' #999')
+          p5.circle(x+4,y+4,8)
+          p5.fill('#eee')
+          p5.text(p.Name,x,y + 40 + 10)
+        }
+      }
+      p5.pop()
+    }
+
     for (const k in lines) {
       if (!nodes[lines[k].NodeID1] || !nodes[lines[k].NodeID2]) {
         continue;
@@ -370,22 +430,41 @@ const mapMain = (p5: P5) => {
         p5.fill("rgba(252,252,252,0.9)");
         p5.stroke("rgba(252,252,252,0.9)");
       }
-      const w = iconSize - 8;
-      p5.rect(-w / 2, -w / 2, w, w);
-      p5.textFont("Material Design Icons");
-      p5.textSize(iconSize);
-      p5.textAlign(p5.CENTER, p5.CENTER);
-      p5.fill(getStateColor(nodes[k].State));
-      p5.text(icon, 0, 0);
-      p5.textFont("Roboto");
-      p5.textSize(fontSize);
-      if (dark) {
-        p5.fill(250);
+      if(nodes[k].Image && imageMap.has(nodes[k].Image)) {
+        const img =  imageMap.get(nodes[k].Image);
+        const h = img.height + 16 + fontSize;
+        const w = 40;
+        p5.rect(-w / 2 , -h / 2, w, h)
+        p5.tint(getStateColor(nodes[k].State))
+        p5.image(img,-24,-h/2 + 10,48)
+        p5.noTint()
+        p5.textAlign(p5.CENTER, p5.CENTER);
+        p5.textFont("Roboto")
+        p5.textSize(fontSize)
+        if (dark) {
+          p5.fill(250);
+        } else {
+          p5.fill(23);
+        }
+        p5.text(nodes[k].Name, 0, img.height - 4);
       } else {
-        p5.fill(23);
+        const w = iconSize - 8;
+        p5.rect(-w / 2, -w / 2, w, w);
+        p5.textFont("Material Design Icons");
+        p5.textSize(iconSize);
+        p5.textAlign(p5.CENTER, p5.CENTER);
+        p5.fill(getStateColor(nodes[k].State));
+        p5.text(icon, 0, 0);
+        p5.textFont("Roboto");
+        p5.textSize(fontSize);
+        if (dark) {
+          p5.fill(250);
+        } else {
+          p5.fill(23);
+        }
+        p5.text(nodes[k].Name, 0, 32);
+        p5.pop();
       }
-      p5.text(nodes[k].Name, 0, 32);
-      p5.pop();
     }
   };
   p5.mouseWheel = (e: any) => {
