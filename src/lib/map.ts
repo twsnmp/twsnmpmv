@@ -559,13 +559,13 @@ iconList.forEach((e) => {
   iconCodeMap.set(e.value, String.fromCodePoint(e.code));
 });
 
-const getIconCode = (icon: string): string => {
+const getIconCode = (icon: string): number => {
   return iconCodeMap.has(icon)
     ? iconCodeMap.get(icon)
     : String.fromCodePoint(0xf0a39);
 };
 
-const getIcon = (icon: string): string => {
+const getIcon = (icon: string): number => {
   return iconMap.get(icon) || "mdi-comment-question-outline";
 };
 
