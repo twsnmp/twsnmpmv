@@ -1,0 +1,32 @@
+[tools]
+node = '20'
+java = 'openjdk-17'
+
+[tasks.check]
+description = 'Run svelte-check to verify code'
+run = 'npm run check'
+
+[tasks.build]
+description = 'Build web assets for production'
+run = 'npm run build'
+
+[tasks."sync"]
+description = 'Sync web assets to native platforms'
+depends = ["build"]
+run = 'npx cap sync'
+
+[tasks."release:android"]
+description = 'Build Android release APK'
+depends = ["sync"]
+run = [
+    'cd android && ./gradlew assembleRelease'
+]
+
+[tasks."release:ios"]
+description = 'Build iOS release'
+depends = ["sync"]
+run = 'npx cap build ios --flavor Release'
+
+[tasks.release]
+description = 'Perform all release steps (Android & iOS)'
+depends = ["check", "release:android", "release:ios"]
