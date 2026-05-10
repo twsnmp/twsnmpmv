@@ -80,9 +80,9 @@
 
 <Modal bind:open={show} size="xl" dismissable={false} on:open={onOpen}>
   <div class="flex flex-col">
-    <div id="chart" />
+    <div id="chart"></div>
     <div class="m-5 grow">
-      <table id="table" class="display compact nowrap" style="width:99%" />
+      <table id="table" class="display compact nowrap" style="width:99%"></table>
     </div>
     <div class="flex justify-end space-x-2 mr-2">
       <GradientButton

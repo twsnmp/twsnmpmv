@@ -58,7 +58,7 @@
 
 </script>
 
-<div bind:this={map} class="h-full w-full overflow-scroll" />
+<div bind:this={map} class="h-full w-full overflow-scroll"></div>
 
 
 <BottomNav

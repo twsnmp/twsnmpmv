@@ -101,5 +101,5 @@
 
 </script>
 
-<div id="map" class="w-full h-full"/>
+<div id="map" class="w-full h-full"></div>
 
