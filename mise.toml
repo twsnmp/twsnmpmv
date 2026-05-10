@@ -1,6 +1,6 @@
 [tools]
 node = '20'
-java = 'openjdk-17'
+java = 'openjdk-21'
 
 [tasks.check]
 description = 'Run svelte-check to verify code'
@@ -10,21 +10,26 @@ run = 'npm run check'
 description = 'Build web assets for production'
 run = 'npm run build'
 
-[tasks."sync"]
-description = 'Sync web assets to native platforms'
+[tasks."sync:android"]
+description = 'Sync web assets to Android platform'
 depends = ["build"]
-run = 'npx cap sync'
+run = 'npx cap sync android'
+
+[tasks."sync:ios"]
+description = 'Sync web assets to iOS platform'
+depends = ["build"]
+run = 'npx cap sync ios'
 
 [tasks."release:android"]
 description = 'Build Android release APK'
-depends = ["sync"]
+depends = ["sync:android"]
 run = [
     'cd android && ./gradlew assembleRelease'
 ]
 
 [tasks."release:ios"]
 description = 'Build iOS release'
-depends = ["sync"]
+depends = ["sync:ios"]
 run = 'npx cap build ios --flavor Release'
 
 [tasks.release]
