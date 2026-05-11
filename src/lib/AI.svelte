@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { Modal, GradientButton } from "flowbite-svelte";
+  import { Modal as ModalOrig, GradientButton } from "flowbite-svelte";
+  const Modal = ModalOrig as any;
   import { Icon } from "mdi-svelte-ts";
   import * as icons from "@mdi/js";
   import DataTable from "datatables.net-dt";
@@ -99,7 +100,7 @@
 
 <svelte:window on:resize={resizeChart} />
 
-<Modal bind:open={show} size="xl" dismissable={false} on:open={onOpen}>
+<Modal bind:open={show} size="xl" outsideclose={false} on:open={onOpen}>
   <div class="flex flex-col">
     <div id="chart" />
     <div class="m-5 grow">

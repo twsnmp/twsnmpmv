@@ -2,7 +2,7 @@ appId: jp.co.twise.twsnmpmv
 ---
 - launchApp
 - tapOn:
-    id: "nav-add-btn"
+    point: "50%, 95%" # nav-add-btn approximate position
 - tapOn: "サイト名"
 - eraseText
 - inputText: "TWSNMP FC"
@@ -13,5 +13,5 @@ appId: jp.co.twise.twsnmpmv
 - tapOn: "パスワード"
 - inputText: "twsnmp"
 - tapOn:
-    id: "save-site-btn"
+    point: "70%, 55%" # save-site-btn approximate position inside modal
 - assertVisible: "TWSNMP FC"

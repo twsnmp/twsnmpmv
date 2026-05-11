@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { Modal, Label, Input, GradientButton } from "flowbite-svelte";
+  import { Modal as ModalOrig, Label, Input, GradientButton } from "flowbite-svelte";
+  const Modal = ModalOrig as any;
   import { ds, type TwsnmpEnt } from "./datastore";
   import { Icon } from "mdi-svelte-ts";
   import * as icons from "@mdi/js";
@@ -18,7 +19,7 @@
 
 </script>
 
-<Modal bind:open={show} size="md" dismissable={false} >
+<Modal bind:open={show} size="md" outsideclose={false} dismissable={false}>
   <form class="flex flex-col space-y-2" action="#">
     <Label class="space-y-1">
       <span>サイト名</span>
@@ -38,7 +39,6 @@
     </Label>
     <div class="flex justify-end space-x-2 mr-2">
       <GradientButton
-        id="save-site-btn"
         shadow
         color="blue"
         type="button"
@@ -48,7 +48,6 @@
         <Icon path={icons.mdiContentSave} size={1.5} />
       </GradientButton>
       <GradientButton
-        id="cancel-site-btn"
         shadow
         type="button"
         color="teal"

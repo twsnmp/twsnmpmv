@@ -1,6 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
-  import { Listgroup, ListgroupItem,GradientButton,Modal } from "flowbite-svelte";
+  import { Listgroup, ListgroupItem,GradientButton,Modal as ModalOrig } from "flowbite-svelte";
+  const Modal = ModalOrig as any;
   import { ds,refreshCount,getStateIcon,getStateColor, type TwsnmpEnt } from "./datastore";
   import { Icon } from "mdi-svelte-ts";
   import * as icons from "@mdi/js";
@@ -60,9 +61,8 @@
         <div class="grow m-1">
           {e.name}
         </div>
-        <GradientButton id="open-site-{e.id}" class="!p-2 mr-1" color="lime" on:click={()=>open(e.id)}><Icon path={icons.mdiNetwork} size={1}/></GradientButton>
-        <GradientButton id="edit-site-{e.id}" class="!p-2 mr-1" color="blue" on:click={()=>edit(e.id)}><Icon path={icons.mdiPencil} size={1}/></GradientButton>
-        <GradientButton id="delete-site-{e.id}" class="!p-2" color="red" on:click={()=>delConfirm(e.id)}><Icon path={icons.mdiTrashCan} size={1} /></GradientButton>
+        <GradientButton class="!p-2 mr-1" color="lime" on:click={()=>open(e.id)}><Icon path={icons.mdiNetwork} size={1}/></GradientButton>        <GradientButton class="!p-2 mr-1" color="blue" on:click={()=>edit(e.id)}><Icon path={icons.mdiPencil} size={1}/></GradientButton>
+        <GradientButton class="!p-2" color="red" on:click={()=>delConfirm(e.id)}><Icon path={icons.mdiTrashCan} size={1} /></GradientButton>
       </div>
     </ListgroupItem>
   {/each}
@@ -78,10 +78,10 @@
       <Icon path={icons.mdiAlert} size={3} color="red" />
     </div>
     <h3 class="mb-2 text-lg font-normal text-gray-500 dark:text-gray-400">削除しますか？</h3>
-    <GradientButton id="confirm-delete-btn" color="red" class="mr-2 !p-2" on:click={del}>
+    <GradientButton color="red" class="mr-2 !p-2" on:click={del}>
       <Icon path={icons.mdiTrashCan} size={1.5} />
     </GradientButton>
-    <GradientButton id="cancel-delete-btn" color="teal" class="!p-2" on:click={()=>showDelConfirm=false}>
+    <GradientButton color="teal" class="!p-2" on:click={()=>showDelConfirm=false}>
       <Icon path={icons.mdiCancel} size={1.5} />
     </GradientButton>
   </div>

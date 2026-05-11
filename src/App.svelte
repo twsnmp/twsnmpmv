@@ -41,14 +41,12 @@
     size="sm"
   >
     <BottomNavItem
-      id="nav-list-btn"
       on:click={() => (page = "list")}
       btnClass="text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-500"
     >
       <Icon path={icons.mdiListBox} size={2} />
     </BottomNavItem>
     <BottomNavItem
-      id="nav-loc-btn"
       on:click={() => (page = "loc")}
       btnClass="text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-500"
     >
@@ -56,7 +54,6 @@
     </BottomNavItem>
     <div class="flex items-center justify-center">
       <BottomNavItem
-        id="nav-add-btn"
         btnClass="inline-flex items-center justify-center w-10 h-10 font-medium bg-blue-600 rounded-full hover:bg-blue-700 group focus:ring-4 focus:ring-blue-300 focus:outline-none dark:focus:ring-blue-800 text-white"
         on:click={add}
       >
@@ -64,7 +61,6 @@
       </BottomNavItem>
     </div>
     <BottomNavItem
-      id="nav-settings-btn"
       btnClass="text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-500"
       on:click={() => {
         page = "list";

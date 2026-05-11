@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { Modal, Label, Input, GradientButton } from "flowbite-svelte";
+  import { Modal as ModalOrig, Label, Input, GradientButton } from "flowbite-svelte";
+  const Modal = ModalOrig as any;
   import { ds  } from "./datastore";
   import { Icon } from "mdi-svelte-ts";
   import * as icons from "@mdi/js";
@@ -23,7 +24,7 @@
 
 </script>
 
-<Modal bind:open={show} size="md" dismissable={false} on:open={onOpen}>
+<Modal bind:open={show} size="md" outsideclose={false} on:open={onOpen}>
   <form class="flex flex-col space-y-2" action="#">
     <Label class="space-y-2">
       <span>地図スタイル</span>
