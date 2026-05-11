@@ -76,6 +76,7 @@ export const initMAP = async (div: HTMLElement, twsnmp: TwsnmpEnt) => {
 };
 
 let oldBackImagePath = "";
+let customIconsFetched = false;
 
 export const updateMAP = async () => {
   const dark = isDark();
@@ -83,6 +84,18 @@ export const updateMAP = async () => {
   if (!map) {
     return;
   }
+  
+  if (!customIconsFetched) {
+    const customIcons = await api.get("/api/conf/icons");
+    if (customIcons && Array.isArray(customIcons)) {
+      customIcons.forEach((c: any) => {
+        iconCodeMap.set(c.Icon, String.fromCodePoint(c.Code));
+        iconMap.set(c.Icon, c.Icon);
+      });
+      customIconsFetched = true;
+    }
+  }
+
   iconSize = map.MapConf.IconSize || 24;
   fontSize = map.MapConf.FontSize || 12;
   nodes = map.Nodes;
@@ -124,6 +137,12 @@ export const updateMAP = async () => {
     });
   }
   for (const k in items) {
+    if (items[k].H < 10) {
+      items[k].H = 100;
+    }
+    if (items[k].W < 10) {
+      items[k].W = 100;
+    }
     switch (items[k].Type) {
       case 3:
         if (!imageMap.has(items[k].ID) && _mapP5 != undefined) {
@@ -306,14 +325,53 @@ const mapMain = (p5: P5) => {
       p5.pop()
     }
 
+    const getLinePos = (id: string, polling: string) => {
+      if (id.startsWith("NET:")) {
+        const a = id.split(":");
+        if (a.length !== 2) {
+          return undefined;
+        }
+        const net = networks[a[1]];
+        if (!net || !net.Ports) {
+          return undefined;
+        }
+        let pi = -1;
+        for (let i = 0; i < net.Ports.length; i++) {
+          if (net.Ports[i].ID === polling) {
+            pi = i;
+            break;
+          }
+        }
+        if (pi < 0) {
+          return undefined;
+        }
+        return {
+          X: net.X + net.Ports[pi].X * 45 + 10 + 20,
+          Y: net.Y + net.Ports[pi].Y * 55 + fontSize + 20 + 10,
+        };
+      }
+      if (!nodes[id]) {
+        return undefined;
+      }
+      return {
+        X: nodes[id].X,
+        Y: nodes[id].Y + 6,
+      };
+    };
+
     for (const k in lines) {
-      if (!nodes[lines[k].NodeID1] || !nodes[lines[k].NodeID2]) {
+      const lp1 = getLinePos(lines[k].NodeID1, lines[k].PollingID1);
+      if (!lp1) {
         continue;
       }
-      const x1 = nodes[lines[k].NodeID1].X;
-      const x2 = nodes[lines[k].NodeID2].X;
-      const y1 = nodes[lines[k].NodeID1].Y;
-      const y2 = nodes[lines[k].NodeID2].Y;
+      const lp2 = getLinePos(lines[k].NodeID2, lines[k].PollingID2);
+      if (!lp2) {
+        continue;
+      }
+      const x1 = lp1.X;
+      const x2 = lp2.X;
+      const y1 = lp1.Y;
+      const y2 = lp2.Y;
       const xm = (x1 + x2) / 2;
       const ym = (y1 + y2) / 2;
       p5.push();
@@ -345,6 +403,31 @@ const mapMain = (p5: P5) => {
           p5.fill(items[k].Color);
           p5.stroke("rgba(23,23,23,0.9)");
           p5.rect(0, 0, items[k].W, items[k].H);
+          break;
+        case 9: // Group(枠)
+          p5.fill("rgba(23,23,23,0.01)");
+          p5.strokeWeight(2);
+          p5.stroke(items[k].Color);
+          p5.rect(0, 0, items[k].W, items[k].H);
+          if (items[k].Text) {
+            p5.textSize(items[k].Size || 12);
+            p5.fill(dark ? 250 : 23);
+            p5.noStroke();
+            p5.textAlign(p5.RIGHT, p5.BOTTOM);
+            p5.text(items[k].Text, items[k].W - 5, items[k].H - 5);
+          }
+          break;
+        case 10: // Group(塗りつぶし)
+          p5.fill(items[k].Color);
+          p5.noStroke();
+          p5.rect(0, 0, items[k].W, items[k].H);
+          if (items[k].Text) {
+            p5.textSize(items[k].Size || 12);
+            p5.fill(dark ? 250 : 23);
+            p5.noStroke();
+            p5.textAlign(p5.RIGHT, p5.BOTTOM);
+            p5.text(items[k].Text, items[k].W - 5, items[k].H - 5);
+          }
           break;
         case 1: // ellipse
           p5.fill(items[k].Color);
@@ -432,11 +515,16 @@ const mapMain = (p5: P5) => {
       }
       if(nodes[k].Image && imageMap.has(nodes[k].Image)) {
         const img =  imageMap.get(nodes[k].Image);
-        const h = img.height + 16 + fontSize;
-        const w = 40;
+        let imgW = Math.max(48, iconSize * 1.5);
+        let imgH = imgW;
+        if (img && img.width > 0 && img.height > 0) {
+          imgH = imgW * (img.height / img.width);
+        }
+        const w = imgW + 16;
+        const h = imgH + 16 + fontSize;
         p5.rect(-w / 2 , -h / 2, w, h)
         p5.tint(getStateColor(nodes[k].State))
-        p5.image(img,-24,-h/2 + 10,48)
+        p5.image(img,-imgW/2,-h/2 + 10,imgW, imgH)
         p5.noTint()
         p5.textAlign(p5.CENTER, p5.CENTER);
         p5.textFont("Roboto")
@@ -446,7 +534,7 @@ const mapMain = (p5: P5) => {
         } else {
           p5.fill(23);
         }
-        p5.text(nodes[k].Name, 0, img.height - 4);
+        p5.text(nodes[k].Name, 0, imgH / 2 + fontSize / 2);
       } else {
         const w = iconSize - 8;
         p5.rect(-w / 2, -w / 2, w, w);
@@ -463,8 +551,8 @@ const mapMain = (p5: P5) => {
           p5.fill(23);
         }
         p5.text(nodes[k].Name, 0, 32);
-        p5.pop();
       }
+      p5.pop();
     }
   };
   p5.mouseWheel = (e: any) => {
@@ -549,6 +637,9 @@ export const iconList = [
   { icon: "mdi-google", value: "mdi-google", code: 0xf02ad },
   { icon: "mdi-disc-player", value: "mdi-disc-player", code: 0xf0960 },
   { icon: "mdi-layers-search", value: "mdi-layers-search", code: 0xf1206 },
+  { icon: "mdi-air-conditioner", value: "mdi-air-conditioner", code: 0xf002b },
+  { icon: "mdi-webcam", value: "mdi-webcam", code: 0xf05a0 },
+  { icon: "mdi-solar-panel", value: "mdi-solar-panel", code: 0xf0d9b },
 ];
 
 const iconMap = new Map();
@@ -559,13 +650,13 @@ iconList.forEach((e) => {
   iconCodeMap.set(e.value, String.fromCodePoint(e.code));
 });
 
-const getIconCode = (icon: string): number => {
+const getIconCode = (icon: string): string => {
   return iconCodeMap.has(icon)
     ? iconCodeMap.get(icon)
     : String.fromCodePoint(0xf0a39);
 };
 
-const getIcon = (icon: string): number => {
+const getIcon = (icon: string): string => {
   return iconMap.get(icon) || "mdi-comment-question-outline";
 };
 
