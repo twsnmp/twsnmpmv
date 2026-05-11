@@ -67,42 +67,49 @@ classInner="grid-cols-8"
 size="sm"
 >
 <BottomNavItem
+  id="map-nav-log-btn"
   on:click={() => {clearModal();showLog = true}}
   btnClass="text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-500"
 >
   <Icon path={icons.mdiListBox} size={2} />
 </BottomNavItem>
 <BottomNavItem
+  id="map-nav-node-btn"
   on:click={() => {clearModal();showNode = true}}
   btnClass="text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-500"
 >
   <Icon path={icons.mdiLaptop} size={2} />
 </BottomNavItem>
 <BottomNavItem
+  id="map-nav-polling-btn"
   on:click={() => {clearModal();showPolling = true}}
   btnClass="text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-500"
 >
   <Icon path={icons.mdiLanCheck} size={2} />
 </BottomNavItem>
 <BottomNavItem
+  id="map-nav-ai-btn"
   on:click={() => {clearModal();showAI = true}}
   btnClass="text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-500"
 >
   <Icon path={icons.mdiBrain} size={2} />
 </BottomNavItem>
 <BottomNavItem
+  id="map-nav-close-btn"
   on:click={back}
   btnClass="text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-500"
 >
   <Icon path={icons.mdiClose} color="red" size={2} />
 </BottomNavItem>
 <BottomNavItem
+  id="map-nav-zoom-in-btn"
   on:click={()=>zoomMap(true)}
   btnClass="text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-500"
 >
   <Icon path={icons.mdiMagnifyPlus} size={2} />
 </BottomNavItem>
 <BottomNavItem
+  id="map-nav-zoom-out-btn"
   on:click={()=>zoomMap(false)}
   btnClass="text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-500"
 >

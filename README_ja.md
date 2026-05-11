@@ -66,6 +66,30 @@ mise run dev
 mise run test
 ```
 
+### E2Eテストと操作録画
+
+このプロジェクトでは、E2Eテストと操作画面の録画に[Maestro](https://maestro.dev/)を使用しています。
+
+#### 前提条件
+- Maestro CLIのインストール:
+  ```bash
+  curl -Ls "https://get.maestro.dev" | bash
+  ```
+- AndroidエミュレータまたはiOSシミュレータが起動していること。
+- アプリがデバイスにインストールされていること（`mise run debug:android` または `mise run debug:ios`）。
+
+#### テストの実行
+すべてのE2Eテストを実行する場合:
+```bash
+mise run e2e:test
+```
+
+#### 操作の録画
+テストフローを実行し、操作画面をMP4ファイルとして録画する場合:
+```bash
+mise run e2e:record
+```
+
 ### ビルドと実行
 
 このプロジェクトでは、`mise`を使用してWebおよびモバイルプラットフォーム向けのビルドと同期タスクを調整しています。

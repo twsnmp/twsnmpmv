@@ -66,6 +66,30 @@ Run tests:
 mise run test
 ```
 
+### E2E Testing & Screen Recording
+
+This project uses [Maestro](https://maestro.dev/) for E2E testing and operation recording.
+
+#### Prerequisites
+- Install Maestro CLI:
+  ```bash
+  curl -Ls "https://get.maestro.dev" | bash
+  ```
+- Ensure an Android Emulator or iOS Simulator is running.
+- Ensure the app is installed on the device (`mise run debug:android` or `mise run debug:ios`).
+
+#### Running Tests
+To run all E2E tests:
+```bash
+mise run e2e:test
+```
+
+#### Recording Operations
+To run a test flow and record the screen to an MP4 file:
+```bash
+mise run e2e:record
+```
+
 ### Building and Running
 
 This project uses `mise` to orchestrate build and synchronization tasks for web and mobile platforms.

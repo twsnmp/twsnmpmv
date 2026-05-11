@@ -10,6 +10,14 @@ run = 'npm run check'
 description = 'Run tests with vitest'
 run = 'npm test'
 
+[tasks."e2e:test"]
+description = 'Run all Maestro E2E tests'
+run = 'maestro test maestro/'
+
+[tasks."e2e:record"]
+description = 'Run a Maestro flow and record the screen to an MP4 file'
+run = 'maestro record maestro/add_site.yaml'
+
 [tasks.dev]
 description = 'Start development server'
 run = 'npm run dev'

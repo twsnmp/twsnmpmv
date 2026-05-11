@@ -91,6 +91,7 @@
     </div>
     <div class="flex justify-end space-x-2 mr-2">
       <GradientButton
+        id="close-polling-btn"
         shadow
         type="button"
         color="teal"

@@ -1,0 +1,17 @@
+appId: jp.co.twise.twsnmpmv
+---
+- launchApp
+- tapOn:
+    id: "nav-add-btn"
+- tapOn: "サイト名"
+- eraseText
+- inputText: "TWSNMP FC"
+- tapOn: "URL"
+- inputText: "http://192.168.1.250:8080"
+- tapOn: "ユーザー名"
+- inputText: "twsnmp"
+- tapOn: "パスワード"
+- inputText: "twsnmp"
+- tapOn:
+    id: "save-site-btn"
+- assertVisible: "TWSNMP FC"

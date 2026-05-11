@@ -31,6 +31,7 @@
     </Label>
     <div class="flex justify-end space-x-2">
       <GradientButton
+        id="save-settings-btn"
         shadow
         color="blue"
         type="button"
@@ -40,6 +41,7 @@
         <Icon path={icons.mdiContentSave} size={1.5} />
       </GradientButton>
       <GradientButton
+        id="cancel-settings-btn"
         shadow
         type="button"
         color="teal"
