@@ -60,6 +60,12 @@ Start the development server:
 mise run dev
 ```
 
+Run tests:
+
+```bash
+mise run test
+```
+
 ### Building and Running
 
 This project uses `mise` to orchestrate build and synchronization tasks for web and mobile platforms.

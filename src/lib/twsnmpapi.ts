@@ -113,7 +113,7 @@ export class TwsnmpAPI {
    */
   async delete(api:string): Promise<boolean> {
     try {
-      const res = await fetch('APIURL'+ api, {
+      const res = await fetch(this.url + api, {
         method: 'DELETE',
         headers: {
         'Authorization': 'Bearer ' + this.token,

@@ -60,6 +60,12 @@ TWSNMP Map Viewerは、[TWSNMP](https://github.com/twise-oss/twsnmpfk)で管理�
 mise run dev
 ```
 
+テストを実行する:
+
+```bash
+mise run test
+```
+
 ### ビルドと実行
 
 このプロジェクトでは、`mise`を使用してWebおよびモバイルプラットフォーム向けのビルドと同期タスクを調整しています。
@@ -101,4 +107,4 @@ mise run release
 
 ## ライセンス
 
-このプロジェクトはMITライセンスの下でライセンスされています。詳細は[LICENSE](LICENSE)ファイルを参照してください。
+このプロジェクトはApache License 2.0の下でライセンスされています。詳細は[LICENSE](LICENSE)ファイルを参照してください。

@@ -6,6 +6,10 @@ java = 'openjdk-21'
 description = 'Run svelte-check to verify code'
 run = 'npm run check'
 
+[tasks.test]
+description = 'Run tests with vitest'
+run = 'npm test'
+
 [tasks.dev]
 description = 'Start development server'
 run = 'npm run dev'
