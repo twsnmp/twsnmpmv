@@ -5,6 +5,10 @@ import { writable } from 'svelte/store';
 import { TwsnmpAPI } from './twsnmpapi';
 
 export const refreshCount = writable(0);
+
+/**
+ * Represents a TWSNMP site configuration.
+ */
 export interface TwsnmpEnt  {
   id : string
   name: string
@@ -14,12 +18,20 @@ export interface TwsnmpEnt  {
   loc: string;
 }
 
+/**
+ * Configuration for the location/map view.
+ */
 export interface LocConfEnt {
   style: string
   zoom: number
   center: string
 }
 
+/**
+ * DataStore manages the application state, including the list of TWSNMP sites,
+ * their current status, and general configuration. It persists data using
+ * Capacitor Preferences and handles periodic background status checks.
+ */
 export class DataStore {
   list :TwsnmpEnt[]
   stateMap: Map<string,string>
@@ -27,6 +39,7 @@ export class DataStore {
   timer: any
   checkIndex: number
   locConf: LocConfEnt
+
   constructor () {
     this.list = [];
     this.locConf = {
@@ -39,7 +52,11 @@ export class DataStore {
     this.checkIndex = 0;
     this.apiMap = new Map();
   }
-  // 読み込み
+
+  /**
+   * Loads site configurations and general settings from persistent storage.
+   * Initializes the background site check process.
+   */
   async load() {
     this.list = [];
     await Preferences.configure({group:"twsnmpmv"});
@@ -60,7 +77,11 @@ export class DataStore {
     refreshCount.update(n=>n+1);
     this.checkSite();
   }
-  // 保存
+
+  /**
+   * Saves or updates a TWSNMP site configuration.
+   * @param t - The TWSNMP entity to save.
+   */
   public async save(t :TwsnmpEnt) {
     if(t.id) {
       this.list = this.list.filter((e)=> e.id != t.id);
@@ -79,6 +100,10 @@ export class DataStore {
     }
   }
 
+  /**
+   * Updates only the location field of a TWSNMP site.
+   * @param t - The TWSNMP entity with updated location.
+   */
   public async saveLoc(t :TwsnmpEnt) {
     if(!t.id) {
       return;
@@ -90,7 +115,9 @@ export class DataStore {
     await Preferences.set({key:t.id,value:v});
   }
 
-  // 保存
+  /**
+   * Saves the general location configuration to persistent storage.
+   */
   public async saveLocConf() {
     if (!this.locConf.style) {
       this.locConf.style = "https://tile.openstreetmap.jp/styles/osm-bright-ja/style.json";
@@ -99,7 +126,11 @@ export class DataStore {
     await Preferences.configure({group:"twsnmpmv_conf"});
     await Preferences.set({key:"locConf",value:v});
   }
-  // 削除
+
+  /**
+   * Deletes a TWSNMP site configuration.
+   * @param id - The ID of the site to delete.
+   */
   async del(id :string) {
     this.list = this.list.filter((e)=> e.id != id);
     await Preferences.configure({group:"twsnmpmv"});
@@ -108,7 +139,12 @@ export class DataStore {
     this.stateMap.delete(id);
     refreshCount.update(n=>n+1);
   }
-  // 取得
+
+  /**
+   * Retrieves a TWSNMP site configuration by ID.
+   * @param id - The ID of the site to retrieve.
+   * @returns The TWSNMP entity, or a default empty entity if not found.
+   */
   get(id: string) :TwsnmpEnt {
     for(const t of this.list) {
       if (id == t.id) {
@@ -124,6 +160,12 @@ export class DataStore {
       loc: "",
     }
   }
+
+  /**
+   * Checks the status of a single site by fetching its nodes.
+   * Updates the stateMap with the overall status (high, low, warn, normal, unknown).
+   * @param i - The index of the site in the list to check.
+   */
   async checkOneSite(i:number) {
     const t = this.list[i];
     let state = "unknown";
@@ -169,6 +211,11 @@ export class DataStore {
     this.stateMap.set(t.id,state);
     refreshCount.update(n=>n+1);
   }
+
+  /**
+   * Initiates periodic status checks for all configured sites.
+   * Runs in a background loop using setTimeout.
+   */
   checkSite() {
     let t = 1;
     if (this.list.length == 0) {
@@ -185,17 +232,32 @@ export class DataStore {
     }
     this.timer = setTimeout(()=>this.checkSite(),t * 1000);
   }
+
+  /**
+   * Stops the background status check process.
+   */
   stopSiteCheck() {
     if(this.timer) {
       clearTimeout(this.timer);
       this.timer = undefined;
     }
   }
+
+  /**
+   * Gets the current status of a site.
+   * @param id - The ID of the site.
+   * @returns The status string (e.g., 'normal', 'high', 'unknown').
+   */
   getState(id:string) :string {
     return this.stateMap.get(id) || "unknown";
   }
 }
 
+/**
+ * Gets the color associated with a status.
+ * @param s - The status string.
+ * @returns The hex color string.
+ */
 export const getStateColor = (s:string):string => {
   switch(s) {
     case "normal":
@@ -210,6 +272,11 @@ export const getStateColor = (s:string):string => {
     return "gray";
 }
 
+/**
+ * Gets the MDI icon associated with a status.
+ * @param s - The status string.
+ * @returns The icon path string.
+ */
 export const getStateIcon = (s:string):string => {
   switch(s) {
   case "normal":

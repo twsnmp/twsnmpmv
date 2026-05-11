@@ -38,6 +38,10 @@ let _mapP5: P5 | undefined = undefined;
 export let api: TwsnmpAPI;
 let scale = 1.0;
 
+/**
+ * Zooms the map in or out.
+ * @param zoomIn - True to zoom in, false to zoom out.
+ */
 export const zoomMap = (zoomIn: boolean) => {
   if (zoomIn) {
     scale += 0.1;
@@ -53,6 +57,12 @@ export const zoomMap = (zoomIn: boolean) => {
   mapRedraw = true;
 };
 
+/**
+ * Initializes the map with a p5.js instance.
+ * @param div - The HTML element to attach the p5.js canvas to.
+ * @param twsnmp - The TWSNMP entity providing connectivity details.
+ * @returns A promise that resolves when initialization is complete.
+ */
 export const initMAP = async (div: HTMLElement, twsnmp: TwsnmpEnt) => {
   _backImage = null;
   mapRedraw = false;
@@ -78,6 +88,10 @@ export const initMAP = async (div: HTMLElement, twsnmp: TwsnmpEnt) => {
 let oldBackImagePath = "";
 let customIconsFetched = false;
 
+/**
+ * Fetches the latest map data from the API and updates the local state.
+ * Triggers a redraw of the p5.js canvas.
+ */
 export const updateMAP = async () => {
   const dark = isDark();
   const map = await api.get("/api/map");
