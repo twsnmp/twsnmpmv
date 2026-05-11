@@ -6,6 +6,24 @@ java = 'openjdk-21'
 description = 'Run svelte-check to verify code'
 run = 'npm run check'
 
+[tasks.dev]
+description = 'Start development server'
+run = 'npm run dev'
+
+[tasks."debug:ios"]
+description = 'Run and debug on iOS simulator'
+depends = ["sync:ios"]
+run = 'npx cap run ios'
+
+[tasks."debug:android"]
+description = 'Run and debug on Android emulator'
+depends = ["sync:android"]
+run = 'npx cap run android'
+
+[tasks.clean]
+description = 'Clean up build artifacts (Xcode DerivedData, etc.)'
+run = 'rm -rf ios/DerivedData'
+
 [tasks.build]
 description = 'Build web assets for production'
 run = 'npm run build'
