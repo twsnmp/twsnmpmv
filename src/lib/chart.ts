@@ -550,6 +550,86 @@ export const showAIHeatMap = (div:string, scores:any) => {
   return chart;
 }
 
+export const showIPAMHeatmap = (div: string, ranges: any) => {
+  if (chart) {
+    chart.dispose();
+  }
+  const el = document.getElementById(div);
+  if (!el) return;
+  chart = echarts.init(el, isDark() ? "dark" : "");
+  const data: any[] = [];
+  const yAxis: string[] = [];
+  const xAxis: string[] = [];
+  let max = 1;
+  if (ranges) {
+    ranges.forEach((r: any, i: number) => {
+      yAxis.push(r.Range);
+      if (r.UsedIP) {
+        r.UsedIP.forEach((v: number, j: number) => {
+          if (i === 0) {
+            xAxis.push(j.toString());
+          }
+          data.push([j, i, v]);
+          if (v > max) {
+            max = v;
+          }
+        });
+      }
+    });
+  }
+  const option = {
+    title: {
+      show: false,
+    },
+    grid: {
+      left: 100,
+      right: 10,
+      top: 10,
+      bottom: 20,
+    },
+    xAxis: {
+      type: "category",
+      data: xAxis,
+      show: false,
+    },
+    yAxis: {
+      type: "category",
+      data: yAxis,
+      axisLabel: {
+        color: isDark() ? "#ccc" : "#333",
+        fontSize: 8,
+      },
+    },
+    visualMap: {
+      show: false,
+      min: 0,
+      max: max,
+      inRange: {
+        color: ["#4575b4", "#fee090", "#d73027"],
+      },
+    },
+    series: [
+      {
+        name: "IPAM",
+        type: "heatmap",
+        data: data,
+        label: {
+          show: false,
+        },
+        emphasis: {
+          itemStyle: {
+            shadowBlur: 10,
+            shadowColor: "rgba(0, 0, 0, 0.5)",
+          },
+        },
+      },
+    ],
+  };
+  chart.setOption(option);
+  chart.resize();
+  return chart;
+};
+
 
 export const resizeChart = () => {
   if (chart) {
