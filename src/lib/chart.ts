@@ -630,6 +630,82 @@ export const showIPAMHeatmap = (div: string, ranges: any) => {
   return chart;
 };
 
+export const showEnvChart = (div: string, sensors: any[], type: string) => {
+  if (chart) {
+    chart.dispose();
+  }
+  const el = document.getElementById(div);
+  if (!el) return;
+  chart = echarts.init(el, isDark() ? "dark" : "");
+  const series: any[] = [];
+  const names: string[] = [];
+  const typesToFilter = ["BarometricPressure", "ECo2", "RSSI"];
+
+  if (sensors) {
+    sensors.forEach((s: any) => {
+      if (!s.EnvData || s.EnvData.length === 0) return;
+      const data: any[] = [];
+      s.EnvData.forEach((d: any) => {
+        const val = d[type];
+        if (typesToFilter.includes(type) && val === 0) return;
+        data.push({
+          name: echarts.time.format(new Date(d.Time / (1000 * 1000)), "{yyyy}/{MM}/{dd} {HH}:{mm}", false),
+          value: [new Date(d.Time / (1000 * 1000)), val],
+        });
+      });
+      if (data.length > 0) {
+        series.push({
+          name: s.Name || s.Address,
+          type: "line",
+          showSymbol: false,
+          data: data,
+        });
+        names.push(s.Name || s.Address);
+      }
+    });
+  }
+  const option = {
+    legend: {
+      data: names,
+      top: 0,
+      textStyle: {
+        color: isDark() ? "#ccc" : "#333",
+        fontSize: 8,
+      },
+    },
+    grid: {
+      left: 40,
+      right: 10,
+      top: 40,
+      bottom: 20,
+    },
+    xAxis: {
+      type: "time",
+      axisLabel: {
+        color: isDark() ? "#ccc" : "#333",
+        fontSize: 8,
+      },
+      splitLine: {
+        show: false,
+      },
+    },
+    yAxis: {
+      type: "value",
+      axisLabel: {
+        color: isDark() ? "#ccc" : "#333",
+        fontSize: 8,
+      },
+    },
+    tooltip: {
+      trigger: "axis",
+    },
+    series: series,
+  };
+  chart.setOption(option);
+  chart.resize();
+  return chart;
+};
+
 
 export const resizeChart = () => {
   if (chart) {
