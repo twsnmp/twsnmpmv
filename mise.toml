@@ -2,6 +2,9 @@
 node = '20'
 java = 'openjdk-21'
 
+[env]
+APP_BUILD_NUMBER = '4'
+
 [tasks.check]
 description = 'Run svelte-check to verify code'
 run = 'npm run check'
@@ -21,6 +24,10 @@ run = 'maestro record maestro/add_site.yaml'
 [tasks.dev]
 description = 'Start development server'
 run = 'npm run dev'
+
+[tasks."set-version"]
+description = 'Set version from git tag and build number from env'
+run = "npx capacitor-set-version -v $(git describe --tags --abbrev=0 | sed 's/^v//') -b $APP_BUILD_NUMBER"
 
 [tasks."debug:ios"]
 description = 'Run and debug on iOS simulator'
@@ -42,12 +49,12 @@ run = 'npm run build'
 
 [tasks."sync:android"]
 description = 'Sync web assets to Android platform'
-depends = ["build"]
+depends = ["build", "set-version"]
 run = 'npx cap sync android'
 
 [tasks."sync:ios"]
 description = 'Sync web assets to iOS platform'
-depends = ["build"]
+depends = ["build", "set-version"]
 run = 'npx cap sync ios'
 
 [tasks."release:android"]
