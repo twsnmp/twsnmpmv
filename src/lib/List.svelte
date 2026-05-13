@@ -72,17 +72,19 @@
 <EditSite  bind:show={showEditSite} {twsnmp}  ></EditSite>
 
 
-<Modal bind:open={showDelConfirm} size="xs" autoclose>
+<Modal bind:open={showDelConfirm} size="xs" dismissable={false}>
   <div class="text-center">
     <div class="flex justify-center mb-1">
       <Icon path={icons.mdiAlert} size={3} color="red" />
     </div>
     <h3 class="mb-2 text-lg font-normal text-gray-500 dark:text-gray-400">削除しますか？</h3>
-    <GradientButton color="red" class="mr-2 !p-2" on:click={del}>
-      <Icon path={icons.mdiTrashCan} size={1.5} />
-    </GradientButton>
-    <GradientButton color="teal" class="!p-2" on:click={()=>showDelConfirm=false}>
-      <Icon path={icons.mdiCancel} size={1.5} />
-    </GradientButton>
+    <div class="flex justify-center gap-4">
+      <GradientButton color="red" class="!p-2" on:click={del}>
+        はい
+      </GradientButton>
+      <GradientButton color="teal" class="!p-2" on:click={() => (showDelConfirm = false)}>
+        いいえ
+      </GradientButton>
+    </div>
   </div>
 </Modal>

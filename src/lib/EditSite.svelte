@@ -47,15 +47,6 @@
       >
         <Icon path={icons.mdiContentSave} size={1.5} />
       </GradientButton>
-      <GradientButton
-        shadow
-        type="button"
-        color="teal"
-        class="!p-2"
-        on:click={close}
-      >
-        <Icon path={icons.mdiCancel} size={1.5} />
-      </GradientButton>
     </div>
   </form>
 </Modal>
