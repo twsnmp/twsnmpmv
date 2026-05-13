@@ -19,7 +19,7 @@
 
 </script>
 
-<Modal bind:open={show} size="md" outsideclose={false} dismissable={false}>
+<Modal title="サイト設定" bind:open={show} size="md" outsideclose={false}>
   <form class="flex flex-col space-y-2" action="#">
     <Label class="space-y-1">
       <span>サイト名</span>

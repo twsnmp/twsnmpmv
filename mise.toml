@@ -33,11 +33,13 @@ run = "npx capacitor-set-version -v $(git describe --tags --abbrev=0 | sed 's/^v
 description = 'Run and debug on iOS simulator'
 depends = ["sync:ios"]
 run = 'npx cap run ios'
+raw = true
 
 [tasks."debug:android"]
 description = 'Run and debug on Android emulator'
 depends = ["sync:android"]
 run = 'npx cap run android'
+raw = true
 
 [tasks.clean]
 description = 'Clean up build artifacts (Xcode DerivedData, etc.)'

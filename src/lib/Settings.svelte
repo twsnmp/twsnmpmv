@@ -24,7 +24,7 @@
 
 </script>
 
-<Modal bind:open={show} size="md" outsideclose={false} on:open={onOpen}>
+<Modal title="設定" bind:open={show} size="md" outsideclose={false} on:open={onOpen}>
   <form class="flex flex-col space-y-2" action="#">
     <Label class="space-y-2">
       <span>地図スタイル</span>

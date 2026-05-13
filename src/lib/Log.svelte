@@ -29,7 +29,7 @@
       paging: false,
       searching:false,
       info:false,
-      scrollY: "30vh",
+      scrollY: "35vh",
       scrollX: true,
       language: ja,
       order: [[1, "desc"]],
@@ -79,34 +79,25 @@
 
 <svelte:window on:resize={resizeChart} />
 
-<Modal bind:open={show} size="xl" outsideclose={false} on:open={onOpen}>
-  <div class="flex flex-col">
+<Modal title="ログ" bind:open={show} size="xl" outsideclose={false} on:open={onOpen}>
+  <div class="flex flex-col h-[70vh]">
     <div id="chart" />
-    <div class="m-5 grow">
-      <table id="table" class="display compact nowrap" style="width:99%" />
-    </div>
-    <div class="flex justify-end space-x-2 mr-2">
-      <GradientButton
-        id="close-log-btn"
-        shadow
-        type="button"
-        color="teal"
-        class="!p-2"
-        on:click={close}
-      >
-        <Icon path={icons.mdiCancel} size={1.5} />
-      </GradientButton>
+    <div class="m-1 grow overflow-auto">
+      <table id="table" class="display compact nowrap text-[10px]" style="width:99%" />
     </div>
   </div>
 </Modal>
 
 <style>
-  #table.nowrap {
+  table.nowrap {
     white-space: nowrap;
   }
   #chart {
     width: 98%;
-    height: 30vh;
+    height: 35vh;
     margin: 0 auto;
+  }
+  :global(.dataTables_wrapper .dataTables_scrollBody) {
+    font-size: 10px;
   }
 </style>

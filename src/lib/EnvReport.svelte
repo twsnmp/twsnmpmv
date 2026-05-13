@@ -45,7 +45,7 @@
         paging: false,
         searching: false,
         info: false,
-        scrollY: "30vh",
+        scrollY: "35vh",
         scrollX: true,
         language: ja,
         destroy: true,
@@ -114,7 +114,7 @@
 
 <svelte:window on:resize={resizeChart} />
 
-<Modal bind:open={show} size="xl" outsideclose={false} on:open={onOpen} title="環境モニター">
+<Modal title="環境モニター" bind:open={show} size="xl" outsideclose={false} on:open={onOpen}>
   <div class="flex flex-col h-[70vh] text-xs sm:text-sm">
     <div class="flex flex-col mb-2 overflow-hidden">
       <div class="overflow-x-auto scrollbar-hide">
@@ -126,21 +126,10 @@
           <TabItem open={selectedType === 'ECo2'} title="CO2" titleClass="px-1 py-2 text-[10px]" on:click={() => selectedType = 'ECo2'} />
         </Tabs>
       </div>
-      <div id="env-report-chart" class="w-full h-[25vh]" />
+      <div id="env-report-chart" class="w-full h-[35vh]" />
     </div>
     <div class="m-1 overflow-auto flex-grow bg-white dark:bg-gray-800">
       <table id="table-env-report" class="display compact nowrap text-[10px]" style="width:99%" />
-    </div>
-    <div class="flex justify-end mt-auto p-2">
-      <GradientButton
-        shadow
-        type="button"
-        color="teal"
-        class="!p-2"
-        on:click={close}
-      >
-        <Icon path={icons.mdiCancel} size={1.2} />
-      </GradientButton>
     </div>
   </div>
 </Modal>

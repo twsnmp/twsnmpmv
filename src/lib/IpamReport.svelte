@@ -38,7 +38,7 @@
         paging: false,
         searching: false,
         info: false,
-        scrollY: "30vh",
+        scrollY: "35vh",
         scrollX: true,
         language: ja,
       });
@@ -71,22 +71,11 @@
 
 <svelte:window on:resize={resizeChart} />
 
-<Modal bind:open={show} size="xl" outsideclose={false} on:open={onOpen} title="IPAM">
+<Modal title="IPAM" bind:open={show} size="xl" outsideclose={false} on:open={onOpen}>
   <div class="flex flex-col h-[70vh] text-xs sm:text-sm">
-    <div id="ipam-report-chart" class="w-full h-[25vh] mb-2" />
+    <div id="ipam-report-chart" class="w-full h-[35vh] mb-2" />
     <div class="m-1 overflow-auto">
       <table id="table-ipam-report" class="display compact nowrap text-[10px]" style="width:99%" />
-    </div>
-    <div class="flex justify-end mt-auto p-2">
-      <GradientButton
-        shadow
-        type="button"
-        color="teal"
-        class="!p-2"
-        on:click={close}
-      >
-        <Icon path={icons.mdiCancel} size={1.2} />
-      </GradientButton>
     </div>
   </div>
 </Modal>

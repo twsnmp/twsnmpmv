@@ -37,7 +37,7 @@
         paging: false,
         searching: false,
         info: false,
-        scrollY: "50vh",
+        scrollY: "65vh",
         scrollX: true,
         language: ja,
       });
@@ -80,21 +80,10 @@
   };
 </script>
 
-<Modal bind:open={show} size="xl" outsideclose={false} on:open={onOpen} title="証明書管理">
+<Modal title="証明書管理" bind:open={show} size="xl" outsideclose={false} on:open={onOpen}>
   <div class="flex flex-col h-[70vh] text-xs sm:text-sm">
     <div class="m-1 overflow-auto">
       <table id="table-cert-report" class="display compact nowrap text-[10px]" style="width:99%" />
-    </div>
-    <div class="flex justify-end mt-auto p-2">
-      <GradientButton
-        shadow
-        type="button"
-        color="teal"
-        class="!p-2"
-        on:click={close}
-      >
-        <Icon path={icons.mdiCancel} size={1.2} />
-      </GradientButton>
     </div>
   </div>
 </Modal>
