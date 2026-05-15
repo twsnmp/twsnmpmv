@@ -12,6 +12,11 @@ TWSNMP Map Viewer is a mobile and web application designed to provide a portable
 - **Status Visualization:** Color-coded status (Normal, Warning, Low, High) and icons for quick identification.
 - **Mobile Friendly:** Built with Capacitor for a seamless mobile experience.
 
+## Download
+
+- **iOS:** Download from the [App Store](https://apps.apple.com/app/twsnmp-map-viewer/id1638466710).
+- **Android:** Download the APK from [GitHub Releases](https://github.com/twise-oss/twsnmpmv/releases).
+
 ## Technology Stack
 
 - **Frontend:** [Svelte](https://svelte.dev/) with [TypeScript](https://www.typescriptlang.org/)

@@ -12,6 +12,11 @@ TWSNMP Map Viewerは、[TWSNMP](https://github.com/twise-oss/twsnmpfk)で管理�
 - **ステータスの視覚化:** 色分けされたステータス（正常、注意、軽度、重度）とアイコンで素早く識別可能。
 - **モバイル対応:** Capacitorを使用してシームレスなモバイル体験を提供。
 
+## ダウンロード
+
+- **iOS:** [App Store](https://apps.apple.com/app/twsnmp-map-viewer/id1638466710)からダウンロードできます。
+- **Android:** [GitHubのリリース](https://github.com/twise-oss/twsnmpmv/releases)からAPKファイルをダウンロードできます。
+
 ## 技術スタック
 
 - **Frontend:** [Svelte](https://svelte.dev/) + [TypeScript](https://www.typescriptlang.org/)
