@@ -1,139 +1,151 @@
 # TWSNMP Map Viewer (twsnmpmv)
 
-[日本語](./README_ja.md)
+[English](./README.md)
 
-TWSNMP Map Viewer is a mobile and web application designed to provide a portable visualization of network status managed by [TWSNMP](https://github.com/twise-oss/twsnmpfk). It allows users to monitor multiple TWSNMP sites, view network maps, and track the status of nodes and pollings in real-time.
+TWSNMP Map Viewerは、[TWSNMP FC](https://github.com/twsnmp/twsnmpfc)で管理されているネットワークの状態をモバイルで視覚化するためのアプリケーションです。複数のTWSNMPサイトを監視し、ネットワークマップを表示して、ノードやポーリングの状態をリアルタイムで追跡できます。
 
-## Features
+## 特徴
 
-- **Multi-site Support:** Monitor multiple TWSNMP instances simultaneously.
-- **Interactive Network Map:** Visualize your network layout with nodes, lines, and status indicators.
-- **Real-time Status Updates:** Periodically fetches status from configured sites.
-- **Status Visualization:** Color-coded status (Normal, Warning, Low, High) and icons for quick identification.
-- **Mobile Friendly:** Built with Capacitor for a seamless mobile experience.
+- **マルチサイト対応:** 複数のTWSNMPインスタンスを同時に監視。
+- **インタラクティブなネットワークマップ:** ノード、ライン、ステータスインジケータを使用してネットワークレイアウトを視覚化。
+- **リアルタイムステータス更新:** 設定されたサイトから定期的にステータスを取得。
+- **ステータスの視覚化:** 色分けされたステータス（正常、注意、軽度、重度）とアイコンで素早く識別可能。
+- **モバイル対応:** Capacitorを使用してシームレスなモバイル体験を提供。
 
-## Download
+## ダウンロード
 
-- **iOS:** Download from the [App Store](https://apps.apple.com/app/twsnmp-map-viewer/id1638466710).
-- **Android:** Download the APK from [GitHub Releases](https://github.com/twise-oss/twsnmpmv/releases).
+- **iOS:** [App Store](https://apps.apple.com/app/twsnmp-map-viewer/id1638466710)からダウンロードできます。
+- **Android:** [GitHubのリリース](https://github.com/twise-oss/twsnmpmv/releases)からAPKファイルをダウンロードできます。
 
-## Technology Stack
+## スクリーンショット
 
-- **Frontend:** [Svelte](https://svelte.dev/) with [TypeScript](https://www.typescriptlang.org/)
+| マップ | サイトリスト |
+| :---: | :---: |
+| ![マップ](images/map.png) | ![リスト](images/list.png) |
+
+| 環境レポート | IPAMレポート |
+| :---: | :---: |
+| ![環境](images/envreport.png) | ![IPAM](images/ipam.png) |
+
+| サイト編集 | AI分析 |
+| :---: | :---: |
+| ![編集](images/edit.png) | ![AI](images/ai.png) |
+
+## 技術スタック
+
+
+- **Frontend:** [Svelte](https://svelte.dev/) + [TypeScript](https://www.typescriptlang.org/)
 - **Build Tool:** [Vite](https://vitejs.dev/)
-- **Visualization:** [p5.js](https://p5js.org/) for the network map
+- **Visualization:** [p5.js](https://p5js.org/) (ネットワークマップの描画)
 - **Mobile Platform:** [Capacitor](https://capacitorjs.com/)
-- **Styling:** Vanilla CSS with [Tailwind CSS](https://tailwindcss.com/) (partially)
-- **API Communication:** Fetch API with JWT authentication
+- **Styling:** Vanilla CSS + [Tailwind CSS](https://tailwindcss.com/) (一部)
+- **API Communication:** Fetch API + JWT認証
 
-## Architecture Overview
+## アーキテクチャ概要
 
-The application follows a simple store-based architecture:
+本アプリケーションは、シンプルなストアベースのアーキテクチャを採用しています。
 
-- **DataStore (`src/lib/datastore.ts`):** The central hub for managing application state, including the list of TWSNMP sites and their current status. It persists data using Capacitor Preferences.
-- **TwsnmpAPI (`src/lib/twsnmpapi.ts`):** A wrapper for interacting with the TWSNMP REST API.
-- **Map Library (`src/lib/map.ts`):** A specialized library using p5.js to render the network map and handle user interactions like zooming.
-- **Svelte Components:** The UI layer, organized into reusable components in `src/lib/`.
+- **DataStore (`src/lib/datastore.ts`):** アプリケーションの状態（TWSNMPサイトのリストや現在のステータスなど）を管理する中心的なハブ。Capacitor Preferencesを使用してデータを永続化します。
+- **TwsnmpAPI (`src/lib/twsnmpapi.ts`):** TWSNMP REST APIとやり取りするためのラッパー。
+- **Map Library (`src/lib/map.ts`):** p5.jsを使用してネットワークマップをレンダリングし、ズームなどのユーザーインタラクションを処理する専用ライブラリ。
+- **Svelte Components:** UIレイヤー。`src/lib/`内の再利用可能なコンポーネントとして構成されています。
 
-## Getting Started
 
-### Prerequisites
+## 自分でビルドする場合
 
-- [mise](https://mise.jdx.dev/) (recommended for managing tools and tasks)
-- Node.js (managed by mise)
-- Java OpenJDK 21 (managed by mise)
+### 前提条件
 
-### Installation
+- [mise](https://mise.jdx.dev/) (ツールとタスクの管理に推奨)
+- Node.js (miseで管理)
+- Java OpenJDK 21 (miseで管理)
 
-1. Clone the repository:
+### インストール
+
+1. リポジトリをクローンする:
    ```bash
    git clone https://github.com/twise-oss/twsnmpmv.git
    cd twsnmpmv
    ```
 
-2. Install tools and dependencies:
+2. ツールと依存関係をインストールする:
    ```bash
    mise install
    npm install
    ```
 
-### Development
+### 開発
 
-Start the development server:
+開発サーバーを起動する:
 
 ```bash
 mise run dev
 ```
 
-Run tests:
+テストを実行する:
 
 ```bash
 mise run test
 ```
 
-### E2E Testing & Screen Recording
+### E2Eテストと操作録画
 
-This project uses [Maestro](https://maestro.dev/) for E2E testing and operation recording.
+このプロジェクトでは、E2Eテストと操作画面の録画に[Maestro](https://maestro.dev/)を使用しています。
 
-#### Prerequisites
-- Install Maestro CLI:
+#### 前提条件
+- Maestro CLIのインストール:
   ```bash
   curl -Ls "https://get.maestro.dev" | bash
   ```
-- Ensure an Android Emulator or iOS Simulator is running.
-- Ensure the app is installed on the device (`mise run debug:android` or `mise run debug:ios`).
+- AndroidエミュレータまたはiOSシミュレータが起動していること。
+- アプリがデバイスにインストールされていること（`mise run debug:android` または `mise run debug:ios`）。
 
-#### Running Tests
-To run all E2E tests:
+#### テストの実行
+すべてのE2Eテストを実行する場合:
 ```bash
 mise run e2e:test
 ```
 
-#### Recording Operations
-To run a test flow and record the screen to an MP4 file:
+#### 操作の録画
+テストフローを実行し、操作画面をMP4ファイルとして録画する場合:
 ```bash
 mise run e2e:record
 ```
 
-### Building and Running
+### ビルドと実行
 
-This project uses `mise` to orchestrate build and synchronization tasks for web and mobile platforms.
+このプロジェクトでは、`mise`を使用してWebおよびモバイルプラットフォーム向けのビルドと同期タスクを調整しています。
 
-#### Web Production Build
+#### Webプロダクションビルド
 ```bash
 mise run build
 ```
 
 #### Android
-- **Debug on Emulator:**
+- **エミュレータでのデバッグ:**
   ```bash
   mise run debug:android
   ```
-- **Build Release APK:**
+- **リリース用APKのビルド:**
   ```bash
   mise run release:android
   ```
 
 #### iOS
-- **Debug on Simulator:**
+- **シミュレータでのデバッグ:**
   ```bash
   mise run debug:ios
   ```
-- **Build Release:**
+- **リリース用ビルド:**
   ```bash
   mise run release:ios
   ```
 
-#### Full Release (Both Platforms)
+#### フルリリース (両プラットフォーム)
 ```bash
 mise run release
 ```
 
-## Documentation
 
-- [Architecture Decision Records (ADRs)](docs/decisions/)
-- [API Documentation](docs/api.md)
+## ライセンス
 
-## License
-
-This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
+このプロジェクトはApache License 2.0の下でライセンスされています。詳細は[LICENSE](LICENSE)ファイルを参照してください。
