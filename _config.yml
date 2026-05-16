@@ -3,3 +3,20 @@ description: A mobile and web application to visualize network status managed by
 remote_theme: pages-themes/hacker@v0.2.0
 plugins:
 - jekyll-remote-theme
+exclude:
+  - index.html
+  - package.json
+  - package-lock.json
+  - node_modules
+  - vendor
+  - tsconfig.json
+  - vite.config.ts
+  - capacitor.config.ts
+  - android
+  - ios
+  - src
+  - public
+  - resources
+  - maestro
+  - mise.toml
+  - _config.yml
