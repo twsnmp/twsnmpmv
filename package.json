@@ -31,7 +31,7 @@
     "datatables.net-dt": "^1.13.8",
     "datatables.net-plugins": "^1.13.6",
     "datatables.net-select-dt": "^1.7.0",
-    "echarts": "^5.4.3",
+    "echarts": "^6.1.0",
     "echarts-gl": "^2.0.9",
     "echarts-stat": "^1.2.0",
     "flowbite": "^2.2.1",
@@ -65,10 +65,11 @@
   },
   "overrides": {
     "esbuild": "^0.25.0",
-    "tar": "^7.5.16",
+    "tar": "^7.5.19",
+    "brace-expansion": "^2.1.2",
     "minimatch": "^9.0.5",
     "tmp": "^0.2.6",
-    "js-yaml": "^4.2.0",
+    "js-yaml": "^4.2.1",
     "uuid": "$uuid"
   }
 }
