@@ -41,7 +41,7 @@
     "mdi-svelte-ts": "^1.0.0",
     "numeral": "^2.0.6",
     "p5": "^1.9.0",
-    "postcss": "^8.4.32",
+    "postcss": "^8.5.23",
     "postcss-load-config": "^5.0.2",
     "prismjs": "^1.29.0",
     "reveal.js": "^5.0.4",
@@ -70,6 +70,8 @@
     "minimatch": "^9.0.5",
     "tmp": "^0.2.6",
     "js-yaml": "^4.2.1",
-    "uuid": "$uuid"
+    "uuid": "$uuid",
+    "undici": "^7.29.0",
+    "postcss": "^8.5.23"
   }
 }
