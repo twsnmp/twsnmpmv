@@ -1,9 +1,12 @@
 <script lang="ts">
   import "maplibre-gl/dist/maplibre-gl.css";
-  import { Map, NavigationControl, Marker } from "maplibre-gl";
+  import { Map, NavigationControl, Marker, setWorkerUrl } from "maplibre-gl";
+  import maplibreglWorkerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?url";
   import {  getStateColor } from "./map";
   import {ds,refreshCount, type TwsnmpEnt} from "./datastore";
   import { onMount, onDestroy,tick } from "svelte";
+
+  setWorkerUrl(maplibreglWorkerUrl);
 
   let map: any = undefined;
   let markers :any = undefined;
@@ -50,12 +53,12 @@
 
     const marker = new Marker({ draggable: true, element: nodeDiv })
       .setLngLat(getLngLat(twsnmp.loc))
-      .addTo(map)
-      .on("dragend", (e) => {
-        const loc = e.target.getLngLat();
-        twsnmp.loc = loc.lng + "," + loc.lat;
-        ds.saveLoc(twsnmp);
-      });
+      .addTo(map);
+    marker.on("dragend", (e: any) => {
+      const loc = e.target.getLngLat();
+      twsnmp.loc = loc.lng + "," + loc.lat;
+      ds.saveLoc(twsnmp);
+    });
     markers.push(marker);
   };
 
