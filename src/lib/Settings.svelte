@@ -1,6 +1,5 @@
 <script lang="ts">
-  import { Modal as ModalOrig, Label, Input, GradientButton } from "flowbite-svelte";
-  const Modal = ModalOrig as any;
+  import { Modal, Label, Input, GradientButton } from "./ui";
   import { ds  } from "./datastore";
   import { Icon } from "mdi-svelte-ts";
   import * as icons from "@mdi/js";
@@ -24,7 +23,7 @@
 
 </script>
 
-<Modal title="設定" bind:open={show} size="md" outsideclose={false} on:open={onOpen}>
+<Modal title="設定" bind:open={show} size="md" outsideclose={false} onopen={onOpen}>
   <form class="flex flex-col space-y-2" action="#">
     <Label class="space-y-2">
       <span>地図スタイル</span>
@@ -37,7 +36,7 @@
         color="blue"
         type="button"
         class="!p-2"
-        on:click={save}
+        onclick={save}
       >
         <Icon path={icons.mdiContentSave} size={1.5} />
       </GradientButton>

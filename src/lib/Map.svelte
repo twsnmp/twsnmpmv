@@ -1,7 +1,7 @@
 <script lang="ts">
   import { initMAP, updateMAP, deleteMap, zoomMap } from "./map";
   import { onMount, onDestroy } from "svelte";
-  import { BottomNav,BottomNavItem,Tooltip,DarkMode,Dropdown,DropdownItem } from "flowbite-svelte";
+  import { BottomNav, BottomNavItem, Tooltip, DarkMode, Dropdown, DropdownItem } from "./ui";
   import * as icons from "@mdi/js";
   import {Icon} from "mdi-svelte-ts";
   import {ds } from "./datastore";
@@ -70,7 +70,7 @@
 
 </script>
 
-<div bind:this={map} class="h-full w-full overflow-scroll" />
+<div bind:this={map} class="h-full w-full overflow-scroll"></div>
 
 
 <BottomNav
@@ -80,21 +80,21 @@ size="sm"
 >
 <BottomNavItem
   id="map-nav-close-btn"
-  on:click={back}
+  onclick={back}
   btnClass="text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-500"
 >
   <Icon path={icons.mdiArrowLeft} size={2} />
 </BottomNavItem>
 <BottomNavItem
   id="map-nav-zoom-in-btn"
-  on:click={()=>zoomMap(true)}
+  onclick={()=>zoomMap(true)}
   btnClass="text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-500"
 >
   <Icon path={icons.mdiMagnifyPlus} size={2} />
 </BottomNavItem>
 <BottomNavItem
   id="map-nav-zoom-out-btn"
-  on:click={()=>zoomMap(false)}
+  onclick={()=>zoomMap(false)}
   btnClass="text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-500"
 >
   <Icon path={icons.mdiMagnifyMinus} size={2} />
@@ -105,49 +105,49 @@ size="sm"
 >
   <Icon path={icons.mdiDotsVertical} size={2} />
   <Dropdown>
-    <DropdownItem on:click={() => {clearModal();showLog = true}}>
+    <DropdownItem onclick={() => {clearModal();showLog = true}}>
       <div class="flex items-center space-x-2">
         <Icon path={icons.mdiListBox} size={1} />
         <span>ログ</span>
       </div>
     </DropdownItem>
-    <DropdownItem on:click={() => {clearModal();showNode = true}}>
+    <DropdownItem onclick={() => {clearModal();showNode = true}}>
       <div class="flex items-center space-x-2">
         <Icon path={icons.mdiLaptop} size={1} />
         <span>ノード</span>
       </div>
     </DropdownItem>
-    <DropdownItem on:click={() => {clearModal();showPolling = true}}>
+    <DropdownItem onclick={() => {clearModal();showPolling = true}}>
       <div class="flex items-center space-x-2">
         <Icon path={icons.mdiLanCheck} size={1} />
         <span>ポーリング</span>
       </div>
     </DropdownItem>
-    <DropdownItem on:click={() => {clearModal();showLanReport = true}}>
+    <DropdownItem onclick={() => {clearModal();showLanReport = true}}>
       <div class="flex items-center space-x-2">
         <Icon path={icons.mdiLan} size={1} />
         <span>LANデバイス</span>
       </div>
     </DropdownItem>
-    <DropdownItem on:click={() => {clearModal();showIpamReport = true}}>
+    <DropdownItem onclick={() => {clearModal();showIpamReport = true}}>
       <div class="flex items-center space-x-2">
         <Icon path={icons.mdiIpNetwork} size={1} />
         <span>IPAM</span>
       </div>
     </DropdownItem>
-    <DropdownItem on:click={() => {clearModal();showCertReport = true}}>
+    <DropdownItem onclick={() => {clearModal();showCertReport = true}}>
       <div class="flex items-center space-x-2">
         <Icon path={icons.mdiCertificate} size={1} />
         <span>証明書管理</span>
       </div>
     </DropdownItem>
-    <DropdownItem on:click={() => {clearModal();showEnvReport = true}}>
+    <DropdownItem onclick={() => {clearModal();showEnvReport = true}}>
       <div class="flex items-center space-x-2">
         <Icon path={icons.mdiThermometer} size={1} />
         <span>環境モニター</span>
       </div>
     </DropdownItem>
-    <DropdownItem on:click={() => {clearModal();showAI = true}}>
+    <DropdownItem onclick={() => {clearModal();showAI = true}}>
       <div class="flex items-center space-x-2">
         <Icon path={icons.mdiBrain} size={1} />
         <span>AI分析</span>

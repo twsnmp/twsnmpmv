@@ -1,6 +1,5 @@
 <script lang="ts">
-  import { Modal as ModalOrig, GradientButton, Tabs, TabItem } from "flowbite-svelte";
-  const Modal = ModalOrig as any;
+  import { Modal, GradientButton, Tabs, TabItem } from "./ui";
   import { Icon } from "mdi-svelte-ts";
   import * as icons from "@mdi/js";
   import DataTable from "datatables.net-dt";
@@ -115,22 +114,22 @@
 
 <svelte:window on:resize={resizeChart} />
 
-<Modal title="環境モニター" bind:open={show} size="xl" outsideclose={false} on:open={onOpen}>
+<Modal title="環境モニター" bind:open={show} size="xl" outsideclose={false} onopen={onOpen}>
   <div class="flex flex-col h-[70vh] text-xs sm:text-sm">
     <div class="flex flex-col mb-2 overflow-hidden">
       <div class="overflow-x-auto scrollbar-hide">
         <Tabs style="underline" contentClass="p-0" defaultClass="flex flex-nowrap space-x-1 rtl:space-x-reverse border-b border-gray-200 dark:border-gray-700 min-w-max">
-          <TabItem open={selectedType === 'RSSI'} title="RSSI" titleClass="px-1 py-2 text-[10px]" on:click={() => selectedType = 'RSSI'} />
-          <TabItem open={selectedType === 'Temp'} title="気温" titleClass="px-1 py-2 text-[10px]" on:click={() => selectedType = 'Temp'} />
-          <TabItem open={selectedType === 'Humidity'} title="湿度" titleClass="px-1 py-2 text-[10px]" on:click={() => selectedType = 'Humidity'} />
-          <TabItem open={selectedType === 'BarometricPressure'} title="気圧" titleClass="px-1 py-2 text-[10px]" on:click={() => selectedType = 'BarometricPressure'} />
-          <TabItem open={selectedType === 'ECo2'} title="CO2" titleClass="px-1 py-2 text-[10px]" on:click={() => selectedType = 'ECo2'} />
+          <TabItem open={selectedType === 'RSSI'} title="RSSI" titleClass="px-1 py-2 text-[10px]" onclick={() => selectedType = 'RSSI'} />
+          <TabItem open={selectedType === 'Temp'} title="気温" titleClass="px-1 py-2 text-[10px]" onclick={() => selectedType = 'Temp'} />
+          <TabItem open={selectedType === 'Humidity'} title="湿度" titleClass="px-1 py-2 text-[10px]" onclick={() => selectedType = 'Humidity'} />
+          <TabItem open={selectedType === 'BarometricPressure'} title="気圧" titleClass="px-1 py-2 text-[10px]" onclick={() => selectedType = 'BarometricPressure'} />
+          <TabItem open={selectedType === 'ECo2'} title="CO2" titleClass="px-1 py-2 text-[10px]" onclick={() => selectedType = 'ECo2'} />
         </Tabs>
       </div>
-      <div id="env-report-chart" class="w-full h-[35vh]" />
+      <div id="env-report-chart" class="w-full h-[35vh]"></div>
     </div>
     <div class="m-1 overflow-auto flex-grow bg-white dark:bg-gray-800">
-      <table id="table-env-report" class="display compact nowrap text-[10px]" style="width:99%" />
+      <table id="table-env-report" class="display compact nowrap text-[10px]" style="width:99%"></table>
     </div>
   </div>
 </Modal>

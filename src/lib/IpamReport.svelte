@@ -1,6 +1,5 @@
 <script lang="ts">
-  import { Modal as ModalOrig, GradientButton } from "flowbite-svelte";
-  const Modal = ModalOrig as any;
+  import { Modal, GradientButton } from "./ui";
   import { Icon } from "mdi-svelte-ts";
   import * as icons from "@mdi/js";
   import DataTable from "datatables.net-dt";
@@ -72,11 +71,11 @@
 
 <svelte:window on:resize={resizeChart} />
 
-<Modal title="IPAM" bind:open={show} size="xl" outsideclose={false} on:open={onOpen}>
+<Modal title="IPAM" bind:open={show} size="xl" outsideclose={false} onopen={onOpen}>
   <div class="flex flex-col h-[70vh] text-xs sm:text-sm">
-    <div id="ipam-report-chart" class="w-full h-[35vh] mb-2" />
+    <div id="ipam-report-chart" class="w-full h-[35vh] mb-2"></div>
     <div class="m-1 overflow-auto">
-      <table id="table-ipam-report" class="display compact nowrap text-[10px]" style="width:99%" />
+      <table id="table-ipam-report" class="display compact nowrap text-[10px]" style="width:99%"></table>
     </div>
   </div>
 </Modal>

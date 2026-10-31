@@ -1,6 +1,5 @@
 <script lang="ts">
-  import { Modal as ModalOrig, Label, Input, Select, GradientButton } from "flowbite-svelte";
-  const Modal = ModalOrig as any;
+  import { Modal, Label, Input, Select, GradientButton } from "./ui";
   import { ds, type TwsnmpEnt } from "./datastore";
   import { Icon } from "mdi-svelte-ts";
   import * as icons from "@mdi/js";
@@ -57,7 +56,7 @@
         color="blue"
         type="button"
         class="!p-2"
-        on:click={save}
+        onclick={save}
       >
         <Icon path={icons.mdiContentSave} size={1.5} />
       </GradientButton>

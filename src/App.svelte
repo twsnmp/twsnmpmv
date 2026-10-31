@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { BottomNav, BottomNavItem, Tooltip, DarkMode } from "flowbite-svelte";
+  import { BottomNav, BottomNavItem, Tooltip, DarkMode } from "./lib/ui";
   import { Icon } from "mdi-svelte-ts";
   import * as icons from "@mdi/js";
   import EditSite from "./lib/EditSite.svelte";
@@ -41,13 +41,13 @@
     size="sm"
   >
     <BottomNavItem
-      on:click={() => (page = "list")}
+      onclick={() => (page = "list")}
       btnClass="text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-500"
     >
       <Icon path={icons.mdiListBox} size={2} />
     </BottomNavItem>
     <BottomNavItem
-      on:click={() => (page = "loc")}
+      onclick={() => (page = "loc")}
       btnClass="text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-500"
     >
       <Icon path={icons.mdiMapMarker} size={2} />
@@ -55,14 +55,14 @@
     <div class="flex items-center justify-center">
       <BottomNavItem
         btnClass="inline-flex items-center justify-center w-10 h-10 font-medium bg-blue-600 rounded-full hover:bg-blue-700 group focus:ring-4 focus:ring-blue-300 focus:outline-none dark:focus:ring-blue-800 text-white"
-        on:click={add}
+        onclick={add}
       >
         <Icon path={icons.mdiPlus} size={2} />
       </BottomNavItem>
     </div>
     <BottomNavItem
       btnClass="text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-500"
-      on:click={() => {
+      onclick={() => {
         page = "list";
         showSettings = true;
       }}

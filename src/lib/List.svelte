@@ -1,7 +1,6 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
-  import { Listgroup, ListgroupItem,GradientButton,Modal as ModalOrig } from "flowbite-svelte";
-  const Modal = ModalOrig as any;
+  import { Listgroup, ListgroupItem, GradientButton, Modal } from "./ui";
   import { ds,refreshCount,getStateIcon,getStateColor, type TwsnmpEnt } from "./datastore";
   import { Icon } from "mdi-svelte-ts";
   import * as icons from "@mdi/js";
@@ -61,8 +60,9 @@
         <div class="grow m-1">
           {e.name}
         </div>
-        <GradientButton class="!p-2 mr-1" color="lime" on:click={()=>open(e.id)}><Icon path={icons.mdiNetwork} size={1}/></GradientButton>        <GradientButton class="!p-2 mr-1" color="blue" on:click={()=>edit(e.id)}><Icon path={icons.mdiPencil} size={1}/></GradientButton>
-        <GradientButton class="!p-2" color="red" on:click={()=>delConfirm(e.id)}><Icon path={icons.mdiTrashCan} size={1} /></GradientButton>
+        <GradientButton class="!p-2 mr-1" color="lime" onclick={()=>open(e.id)}><Icon path={icons.mdiNetwork} size={1}/></GradientButton>
+        <GradientButton class="!p-2 mr-1" color="blue" onclick={()=>edit(e.id)}><Icon path={icons.mdiPencil} size={1}/></GradientButton>
+        <GradientButton class="!p-2" color="red" onclick={()=>delConfirm(e.id)}><Icon path={icons.mdiTrashCan} size={1} /></GradientButton>
       </div>
     </ListgroupItem>
   {/each}
@@ -79,10 +79,10 @@
     </div>
     <h3 class="mb-2 text-lg font-normal text-gray-500 dark:text-gray-400">削除しますか？</h3>
     <div class="flex justify-center gap-4">
-      <GradientButton color="red" class="!p-2" on:click={del}>
+      <GradientButton color="red" class="!p-2" onclick={del}>
         はい
       </GradientButton>
-      <GradientButton color="teal" class="!p-2" on:click={() => (showDelConfirm = false)}>
+      <GradientButton color="teal" class="!p-2" onclick={() => (showDelConfirm = false)}>
         いいえ
       </GradientButton>
     </div>
