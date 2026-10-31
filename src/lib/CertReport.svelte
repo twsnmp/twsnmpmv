@@ -71,7 +71,8 @@
   const onOpen = async () => {
     if (!api) return;
     try {
-      const res = await api.get("/api/report/cert");
+      const path = api.getReportPath ? api.getReportPath("cert") : "/api/report/cert";
+      const res = await api.get(path);
       dataList = Array.isArray(res) ? res : [];
       await showTable();
     } catch (e) {

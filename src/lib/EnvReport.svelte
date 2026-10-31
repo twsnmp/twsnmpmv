@@ -98,7 +98,8 @@
   const onOpen = async () => {
     if (!api) return;
     try {
-      const res = await api.get("/api/report/EnvMonitor");
+      const path = api.getReportPath ? api.getReportPath("env") : "/api/report/EnvMonitor";
+      const res = await api.get(path);
       dataList = Array.isArray(res) ? res : [];
       selectedType = "RSSI";
       await showTable();

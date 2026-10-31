@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Modal as ModalOrig, Label, Input, GradientButton } from "flowbite-svelte";
+  import { Modal as ModalOrig, Label, Input, Select, GradientButton } from "flowbite-svelte";
   const Modal = ModalOrig as any;
   import { ds, type TwsnmpEnt } from "./datastore";
   import { Icon } from "mdi-svelte-ts";
@@ -7,6 +7,16 @@
 
   export let show = false;
   export let twsnmp : TwsnmpEnt;
+
+  const serverTypeOptions = [
+    { value: "auto", name: "自動判定 (推奨)" },
+    { value: "neo", name: "TWSNMP NEO" },
+    { value: "fc", name: "TWSNMP FC" },
+  ];
+
+  $: if (twsnmp && !twsnmp.serverType) {
+    twsnmp.serverType = "auto";
+  }
 
   const close = () => {
     show = false;
@@ -24,6 +34,10 @@
     <Label class="space-y-1">
       <span>サイト名</span>
       <Input bind:value={twsnmp.name} size="sm" />
+    </Label>
+    <Label class="space-y-1">
+      <span>種別</span>
+      <Select items={serverTypeOptions} bind:value={twsnmp.serverType} size="sm" />
     </Label>
     <Label class="space-y-1">
       <span>URL</span>

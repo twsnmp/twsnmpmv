@@ -20,7 +20,7 @@
     page = "map";
   };
   const add = () => {
-    twsnmp = { id: "", name: "New", url: "", user: "", password: "", loc: "" };
+    twsnmp = { id: "", name: "New", url: "", user: "", password: "", loc: "", serverType: "auto" };
     showEditSite = true;
   }
 </script>

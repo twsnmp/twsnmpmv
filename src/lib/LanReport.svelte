@@ -65,7 +65,8 @@
   const onOpen = async () => {
     if (!api) return;
     try {
-      const res = await api.get("/api/report/devices");
+      const path = api.getReportPath ? api.getReportPath("devices") : "/api/report/devices";
+      const res = await api.get(path);
       dataList = Array.isArray(res) ? res : [];
       await showTable();
     } catch (e) {

@@ -3,7 +3,7 @@ import { type TwsnmpEnt } from "./datastore";
 import { TwsnmpAPI } from "./twsnmpapi";
 import * as echarts from "echarts";
 import mdiFont from "@mdi/font/fonts/materialdesignicons-webfont.ttf";
-import { gauge, bar, line } from "./drawitem";
+import { gauge, bar, line, kpi } from "./drawitem";
 import portImageUrl from "../assets/port.png";
 
 const MAP_SIZE_X = 2000;
@@ -32,7 +32,10 @@ let portImage : any = undefined;
 let fontSize = 10;
 let iconSize = 24;
 
-const imageMap = new Map();
+const imageMap = new Map<string, any>();
+const iconImageMap = new Map<string, string>();
+const loadingImages = new Set<string>();
+const failedImages = new Set<string>();
 
 let _mapP5: P5 | undefined = undefined;
 export let api: TwsnmpAPI;
@@ -66,13 +69,18 @@ export const zoomMap = (zoomIn: boolean) => {
 export const initMAP = async (div: HTMLElement, twsnmp: TwsnmpEnt) => {
   _backImage = null;
   mapRedraw = false;
+  customIconsFetched = false;
+  imageMap.clear();
+  loadingImages.clear();
+  failedImages.clear();
+  iconImageMap.clear();
   nodes = {};
   lines = [];
   items = [];
   networks = [];
   pollings = {};
   logs = [];
-  api = new TwsnmpAPI(twsnmp.url);
+  api = new TwsnmpAPI(twsnmp.url, twsnmp.serverType);
   if (!(await api.login(twsnmp.user, twsnmp.password))) {
     return;
   }
@@ -88,37 +96,88 @@ export const initMAP = async (div: HTMLElement, twsnmp: TwsnmpEnt) => {
 let oldBackImagePath = "";
 let customIconsFetched = false;
 
+const registerIcons = (iconList: any[]) => {
+  if (!iconList || !Array.isArray(iconList)) return;
+  iconList.forEach((c: any) => {
+    const key = c.Name || c.name || c.Icon || c.icon || c.value || c.ID || c.id;
+    const code = c.Code != null ? c.Code : c.code;
+    const imgData = c.Image || c.image;
+
+    if (key) {
+      if (code != null && code !== 0) {
+        iconCodeMap.set(key, String.fromCodePoint(code));
+        iconMap.set(key, key);
+      }
+      if (imgData && typeof imgData === "string") {
+        iconImageMap.set(key, imgData);
+        if (c.Name) iconImageMap.set(c.Name, imgData);
+        if (c.name) iconImageMap.set(c.name, imgData);
+        if (c.value) iconImageMap.set(c.value, imgData);
+        if (c.ID) iconImageMap.set(c.ID, imgData);
+        if (c.id) iconImageMap.set(c.id, imgData);
+
+        if (imgData.startsWith("data:") && _mapP5 && !imageMap.has(key) && !loadingImages.has(key)) {
+          loadingImages.add(key);
+          _mapP5.loadImage(
+            imgData,
+            (loaded) => {
+              imageMap.set(key, loaded);
+              if (c.Name) imageMap.set(c.Name, loaded);
+              if (c.name) imageMap.set(c.name, loaded);
+              loadingImages.delete(key);
+              mapRedraw = true;
+            },
+            () => {
+              loadingImages.delete(key);
+              failedImages.add(key);
+            }
+          );
+        }
+      }
+    }
+  });
+};
+
 /**
  * Fetches the latest map data from the API and updates the local state.
  * Triggers a redraw of the p5.js canvas.
  */
 export const updateMAP = async () => {
   const dark = isDark();
-  const map = await api.get("/api/map");
+  const map = await api.fetchMap();
   if (!map) {
     return;
   }
   
-  if (!customIconsFetched) {
-    const customIcons = await api.get("/api/conf/icons");
+  if (map.Icons && Array.isArray(map.Icons) && map.Icons.length > 0) {
+    registerIcons(map.Icons);
+    customIconsFetched = true;
+  } else if (!customIconsFetched) {
+    const iconPath = api.getCustomIconsPath();
+    const customIcons = await api.get(iconPath);
     if (customIcons && Array.isArray(customIcons)) {
-      customIcons.forEach((c: any) => {
-        iconCodeMap.set(c.Icon, String.fromCodePoint(c.Code));
-        iconMap.set(c.Icon, c.Icon);
-      });
+      registerIcons(customIcons);
       customIconsFetched = true;
     }
   }
 
-  iconSize = map.MapConf.IconSize || 24;
-  fontSize = map.MapConf.FontSize || 12;
-  nodes = map.Nodes;
-  lines = map.Lines;
-  items = map.Items;
-  networks = map.Networks;
-  pollings = map.Pollings;
-  logs = map.Logs;
-  backImage = map.MapConf.BackImage;
+  const mapConf = map.MapConf || {};
+  const z = mapConf.IconSize || 24;
+  if (z <= 5) {
+    iconSize = 8 + z * 8;
+    fontSize = 6 + z * 2;
+  } else {
+    iconSize = z;
+    fontSize = mapConf.FontSize || 12;
+  }
+
+  nodes = map.Nodes || {};
+  lines = map.Lines || [];
+  items = map.Items || {};
+  networks = map.Networks || {};
+  pollings = map.Pollings || {};
+  logs = map.Logs || [];
+  backImage = mapConf.BackImage || { X: 0, Y: 0, Width: 0, Height: 0, Path: "" };
 
   if (
     backImage &&
@@ -128,19 +187,76 @@ export const updateMAP = async () => {
   ) {
     oldBackImagePath = backImage.Path;
     _backImage = null;
-    _mapP5.loadImage(await api.get("/backimage", "data"), (img) => {
-      _backImage = img;
-      mapRedraw = true;
-    });
+    const bgUrl = api.getBackImageUrl(backImage.Path);
+    api.get(bgUrl, "data").then((bgData: any) => {
+      if (bgData && _mapP5) {
+        _mapP5.loadImage(bgData, (img) => {
+          _backImage = img;
+          mapRedraw = true;
+        });
+      }
+    }).catch(() => {});
   } else if (_backImage && !backImage.Path) {
     _backImage = null;
   }
   for (const k in nodes) {
-    if(nodes[k].Image && !imageMap.has(nodes[k].Image) && _mapP5) {
-      const tmp = await api.get("/imageIcon/" + nodes[k].Image, "data");
-      _mapP5.loadImage(tmp, (img) => {
-        imageMap.set(nodes[k].Image,img);
-        mapRedraw = true
+    const imgKey = nodes[k].Image || nodes[k].image;
+    if (!imgKey || imageMap.has(imgKey) || loadingImages.has(imgKey) || failedImages.has(imgKey) || !_mapP5) {
+      continue;
+    }
+    if (imgKey.startsWith("data:image/")) {
+      loadingImages.add(imgKey);
+      _mapP5.loadImage(
+        imgKey,
+        (img) => {
+          imageMap.set(imgKey, img);
+          loadingImages.delete(imgKey);
+          mapRedraw = true;
+        },
+        () => {
+          loadingImages.delete(imgKey);
+          failedImages.add(imgKey);
+        }
+      );
+    } else if (iconImageMap.has(imgKey)) {
+      const dataUrl = iconImageMap.get(imgKey)!;
+      loadingImages.add(imgKey);
+      _mapP5.loadImage(
+        dataUrl,
+        (img) => {
+          imageMap.set(imgKey, img);
+          loadingImages.delete(imgKey);
+          mapRedraw = true;
+        },
+        () => {
+          loadingImages.delete(imgKey);
+          failedImages.add(imgKey);
+        }
+      );
+    } else {
+      loadingImages.add(imgKey);
+      const nodeImgUrl = api.getNodeImageUrl(imgKey);
+      api.get(nodeImgUrl, "data").then((tmp: any) => {
+        if (tmp && _mapP5) {
+          _mapP5.loadImage(
+            tmp,
+            (img) => {
+              imageMap.set(imgKey, img);
+              loadingImages.delete(imgKey);
+              mapRedraw = true;
+            },
+            () => {
+              loadingImages.delete(imgKey);
+              failedImages.add(imgKey);
+            }
+          );
+        } else {
+          loadingImages.delete(imgKey);
+          failedImages.add(imgKey);
+        }
+      }).catch(() => {
+        loadingImages.delete(imgKey);
+        failedImages.add(imgKey);
       });
     }
   }
@@ -158,15 +274,68 @@ export const updateMAP = async () => {
       items[k].W = 100;
     }
     switch (items[k].Type) {
-      case 3:
-        if (!imageMap.has(items[k].ID) && _mapP5 != undefined) {
-          const tmp = await api.get("/image/" + items[k].Path, "data");
-          _mapP5.loadImage(tmp, (img) => {
-            imageMap.set(items[k].ID, img);
-            mapRedraw = true;
-          });
+      case 3: {
+        const itemPath = items[k].Path || items[k].path;
+        const loadKey = items[k].ID || k;
+        if (itemPath && !imageMap.has(loadKey) && !loadingImages.has(loadKey) && !failedImages.has(loadKey) && _mapP5) {
+          if (itemPath.startsWith("data:image/")) {
+            loadingImages.add(loadKey);
+            _mapP5.loadImage(
+              itemPath,
+              (img) => {
+                imageMap.set(loadKey, img);
+                loadingImages.delete(loadKey);
+                mapRedraw = true;
+              },
+              () => {
+                loadingImages.delete(loadKey);
+                failedImages.add(loadKey);
+              }
+            );
+          } else if (iconImageMap.has(itemPath)) {
+            const dataUrl = iconImageMap.get(itemPath)!;
+            loadingImages.add(loadKey);
+            _mapP5.loadImage(
+              dataUrl,
+              (img) => {
+                imageMap.set(loadKey, img);
+                loadingImages.delete(loadKey);
+                mapRedraw = true;
+              },
+              () => {
+                loadingImages.delete(loadKey);
+                failedImages.add(loadKey);
+              }
+            );
+          } else {
+            loadingImages.add(loadKey);
+            const itemImgUrl = api.getItemImageUrl(itemPath);
+            api.get(itemImgUrl, "data").then((tmp: any) => {
+              if (tmp && _mapP5) {
+                _mapP5.loadImage(
+                  tmp,
+                  (img) => {
+                    imageMap.set(loadKey, img);
+                    loadingImages.delete(loadKey);
+                    mapRedraw = true;
+                  },
+                  () => {
+                    loadingImages.delete(loadKey);
+                    failedImages.add(loadKey);
+                  }
+                );
+              } else {
+                loadingImages.delete(loadKey);
+                failedImages.add(loadKey);
+              }
+            }).catch(() => {
+              loadingImages.delete(loadKey);
+              failedImages.add(loadKey);
+            });
+          }
         }
         break;
+      }
       case 2:
       case 4:
         items[k].W = items[k].Size * items[k].Text.length;
@@ -232,6 +401,26 @@ export const updateMAP = async () => {
           );
         }
         break;
+      case 11: // PollingKPI
+        if (_mapP5) {
+          _mapP5.loadImage(
+            kpi(
+              items[k].Text || "",
+              items[k].FormattedText || (items[k].Value != null ? String(items[k].Value) : ""),
+              items[k].Value || 0,
+              items[k].Color || "",
+              items[k].Values || [],
+              dark,
+              items[k].W || 220,
+              items[k].H || 84
+            ),
+            (img) => {
+              imageMap.set(k, img);
+              mapRedraw = true;
+            }
+          );
+        }
+        break;
     }
   }
   mapRedraw = true;
@@ -242,6 +431,10 @@ export const deleteMap = () => {
     _mapP5.remove();
     _mapP5 = undefined;
   }
+  imageMap.clear();
+  loadingImages.clear();
+  failedImages.clear();
+  iconImageMap.clear();
 };
 
 const getLineColor = (state: string) => {
@@ -506,9 +699,10 @@ const mapMain = (p5: P5) => {
           p5.triangle(x1, y1, x2, y2, x3, y3);
           break;
         }
-        case 6: // New Gauge,Line,Bar
+        case 6: // New Gauge,Line,Bar,PollingKPI
         case 7:
         case 8:
+        case 11:
           if (imageMap.has(k)) {
             p5.image(imageMap.get(k), 0, 0, items[k].W, items[k].H)
           }

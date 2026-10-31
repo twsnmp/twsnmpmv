@@ -60,7 +60,8 @@
   const onOpen = async () => {
     if (!api) return;
     try {
-      const res = await api.get("/api/report/ipam");
+      const path = api.getReportPath ? api.getReportPath("ipam") : "/api/report/ipam";
+      const res = await api.get(path);
       dataList = Array.isArray(res) ? res : [];
       await showTable();
     } catch (e) {

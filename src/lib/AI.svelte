@@ -53,9 +53,13 @@
     if(!api || !id) {
       return;
     }
-    const air = await api.get("/api/report/ai/" +id);
-    if(air && air.AIResult) {
-      showAIHeatMap("chart",air.AIResult.ScoreData);
+    const path = api.getReportPath ? api.getReportPath("ai") : "/api/report/ai/";
+    const air = await api.get(path + id);
+    if(air) {
+      const scoreData = (air.AIResult && air.AIResult.ScoreData) || air.ScoreData;
+      if (scoreData) {
+        showAIHeatMap("chart", scoreData);
+      }
     }
   }
 
@@ -88,9 +92,14 @@
 
   const onOpen = async () => {
     data = [];
-    const ai = await api.get("/api/report/ailist");
-    for(const a of ai) {
-      data.push(a);
+    const listPath = api.getReportPath ? api.getReportPath("ailist") : "/api/report/ailist";
+    const ai = await api.get(listPath);
+    if (Array.isArray(ai)) {
+      for(const a of ai) {
+        a.NodeName = a.NodeName || a.Node || "";
+        a.PollingName = a.PollingName || a.Polling || "";
+        data.push(a);
+      }
     }
     await tick();
     showTable();

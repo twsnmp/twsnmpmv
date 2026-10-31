@@ -16,6 +16,7 @@ export interface TwsnmpEnt  {
   user:string;
   password:string;
   loc: string;
+  serverType?: "auto" | "fc" | "neo";
 }
 
 /**
@@ -158,6 +159,7 @@ export class DataStore {
       user: "",
       password: "",
       loc: "",
+      serverType: "auto",
     }
   }
 
@@ -175,7 +177,7 @@ export class DataStore {
       if ( this.apiMap.has(t.id)) {
         api = this.apiMap.get(t.id);
       } else {
-        api = new TwsnmpAPI(t.url);
+        api = new TwsnmpAPI(t.url, t.serverType);
         if(!await api.login(t.user,t.password) ) {
           this.stateMap.set(t.id,"unknown");
           refreshCount.update(n=>n+1);
