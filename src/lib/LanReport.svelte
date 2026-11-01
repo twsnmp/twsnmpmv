@@ -4,7 +4,7 @@
   import * as icons from "@mdi/js";
   import DataTable from "datatables.net-dt";
   import "datatables.net-select-dt";
-  import { api, renderScore, renderTime, renderIP } from "./map";
+  import { api, renderScore, renderTime, renderIP, nodes } from "./map";
   import ja from "datatables.net-plugins/i18n/ja.json";
   import { tick } from "svelte";
   import "../assets/jquery.dataTables.css";
@@ -66,7 +66,63 @@
     try {
       const path = api.getReportPath ? api.getReportPath("devices") : "/api/report/devices";
       const res = await api.get(path);
-      dataList = Array.isArray(res) ? res : [];
+      const rawList = Array.isArray(res) ? res : [];
+      if (api.serverType === "neo" || (rawList.length > 0 && rawList[0].MAC !== undefined && rawList[0].ID === undefined)) {
+        // Normalize NEO ARP table & nodes into FC devices format
+        const arpByIP = new Map<string, any>();
+        const arpByMAC = new Map<string, any>();
+        for (const a of rawList) {
+          if (a.IP) arpByIP.set(a.IP, a);
+          if (a.MAC) arpByMAC.set(String(a.MAC).toUpperCase(), a);
+        }
+
+        const list: any[] = [];
+        const seenIPs = new Set<string>();
+        const seenMACs = new Set<string>();
+
+        // 1. Add known nodes from map
+        if (nodes) {
+          for (const k in nodes) {
+            const n = nodes[k];
+            const cleanMac = String(n.MAC || "").toUpperCase();
+            const matchedArp = (n.IP ? arpByIP.get(n.IP) : undefined) || (cleanMac ? arpByMAC.get(cleanMac) : undefined);
+            const state = String(n.State || "").toLowerCase();
+            const score = state === "normal" ? 40 : (state === "warn" ? 50 : (state ? 80 : 40));
+            list.push({
+              Score: score,
+              ID: cleanMac || (matchedArp ? matchedArp.MAC : "-"),
+              Name: n.Name || "",
+              IP: n.IP || (matchedArp ? matchedArp.IP : ""),
+              Vendor: n.Vendor || (matchedArp ? matchedArp.Vendor : ""),
+              FirstTime: matchedArp ? matchedArp.FirstTime : 0,
+              LastTime: matchedArp ? matchedArp.LastTime : 0,
+            });
+            if (n.IP) seenIPs.add(n.IP);
+            if (cleanMac) seenMACs.add(cleanMac);
+          }
+        }
+
+        // 2. Add remaining unmanaged ARP entries
+        for (const a of rawList) {
+          const cleanMac = String(a.MAC || "").toUpperCase();
+          if (!seenIPs.has(a.IP) && (!cleanMac || !seenMACs.has(cleanMac))) {
+            list.push({
+              Score: 40,
+              ID: a.MAC || "-",
+              Name: a.Vendor || a.IP,
+              IP: a.IP,
+              Vendor: a.Vendor || "",
+              FirstTime: a.FirstTime || 0,
+              LastTime: a.LastTime || 0,
+            });
+            if (a.IP) seenIPs.add(a.IP);
+            if (cleanMac) seenMACs.add(cleanMac);
+          }
+        }
+        dataList = list;
+      } else {
+        dataList = rawList;
+      }
       await showTable();
     } catch (e) {
       console.error("Fetch LAN report failed", e);

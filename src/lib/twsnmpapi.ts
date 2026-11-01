@@ -197,11 +197,14 @@ export class TwsnmpAPI {
         Object.assign(Items, itemList);
       }
 
-      const Pollings: Record<string, any> = {};
+      const Pollings: Record<string, any[]> = {};
       if (Array.isArray(pollingsList)) {
         pollingsList.forEach((p: any) => {
-          const id = p.ID || p.id;
-          if (id) Pollings[id] = p;
+          const nid = p.NodeID || p.node_id || p.nodeId || "";
+          if (!Pollings[nid]) {
+            Pollings[nid] = [];
+          }
+          Pollings[nid].push(p);
         });
       } else if (pollingsList && typeof pollingsList === 'object') {
         Object.assign(Pollings, pollingsList);
@@ -282,13 +285,13 @@ export class TwsnmpAPI {
     if (this.serverType === 'neo') {
       switch (kind) {
         case 'devices':
-          return '/api/report/log/device';
+          return '/api/arp';
         case 'ipam':
           return '/api/ipam';
         case 'cert':
           return '/api/cert_monitors';
         case 'env':
-          return '/api/report/log/env';
+          return '/api/report/log/envMonitor';
         case 'ailist':
           return '/api/report/ai';
         case 'ai':

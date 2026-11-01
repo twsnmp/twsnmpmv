@@ -143,7 +143,7 @@ describe('TwsnmpAPI', () => {
       const mockItems = [{ ID: 'i1', Type: 11, Text: 'CPU', Value: 42 }];
       const mockConf = { IconSize: 3, MapName: 'Office' };
       const mockBackImg = { Path: 'bg.png', Width: 1920, Height: 1080 };
-      const mockPollings = [{ ID: 'p1', Name: 'Ping', State: 'normal' }];
+      const mockPollings = [{ ID: 'p1', NodeID: 'n1', Name: 'Ping', State: 'normal' }];
       const mockLogs = [{ Time: 123456, Event: 'Node up' }];
       const mockIcons = [{ Icon: 'mdi-router', Code: 0xf001 }];
 
@@ -166,7 +166,7 @@ describe('TwsnmpAPI', () => {
       expect(map.Nodes['n1']).toEqual(mockNodes[0]);
       expect(map.Networks['net1']).toEqual(mockNets[0]);
       expect(map.Items['i1']).toEqual(mockItems[0]);
-      expect(map.Pollings['p1']).toEqual(mockPollings[0]);
+      expect(map.Pollings['n1']).toEqual([mockPollings[0]]);
       expect(map.Lines).toEqual(mockLines);
       expect(map.Logs).toEqual(mockLogs);
       expect(map.MapConf.IconSize).toBe(3);
@@ -203,10 +203,10 @@ describe('TwsnmpAPI', () => {
       expect(neoApi.getNodeImageUrl('custom_server.png')).toBe('/api/map/image/custom_server.png');
       expect(neoApi.getItemImageUrl('icon.png')).toBe('/api/map/image/icon.png');
       expect(neoApi.getCustomIconsPath()).toBe('/api/icons');
-      expect(neoApi.getReportPath('devices')).toBe('/api/report/log/device');
+      expect(neoApi.getReportPath('devices')).toBe('/api/arp');
       expect(neoApi.getReportPath('ipam')).toBe('/api/ipam');
       expect(neoApi.getReportPath('cert')).toBe('/api/cert_monitors');
-      expect(neoApi.getReportPath('env')).toBe('/api/report/log/env');
+      expect(neoApi.getReportPath('env')).toBe('/api/report/log/envMonitor');
       expect(neoApi.getReportPath('ailist')).toBe('/api/report/ai');
       expect(neoApi.getReportPath('ai')).toBe('/api/ai/result/');
     });

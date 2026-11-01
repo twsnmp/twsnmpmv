@@ -61,7 +61,7 @@
     try {
       const path = api.getReportPath ? api.getReportPath("ipam") : "/api/report/ipam";
       const res = await api.get(path);
-      dataList = Array.isArray(res) ? res : [];
+      dataList = Array.isArray(res) ? res : (res && Array.isArray(res.Ranges) ? res.Ranges : []);
       await showTable();
     } catch (e) {
       console.error("Fetch IPAM report failed", e);

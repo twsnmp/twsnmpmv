@@ -84,8 +84,14 @@
     {
       data: "LastTime",
       title: "最終確認",
-      render: (data:number,type:string) =>
-        renderTime(data * 1000 * 1000 * 1000,type),
+      render: (data: number, type: string) => {
+        if (!data) return "";
+        // If data is already in nanoseconds (>= 1e14), pass as is.
+        // If in milliseconds (>= 1e11), multiply by 1e6.
+        // If in seconds (< 1e11), multiply by 1e9.
+        const nano = data > 1e14 ? data : (data > 1e11 ? data * 1000 * 1000 : data * 1000 * 1000 * 1000);
+        return renderTime(nano, type);
+      },
     },
   ];
 
@@ -108,7 +114,7 @@
 
 <svelte:window on:resize={resizeChart} />
 
-<Modal title="AI分析" bind:open={show} size="xl" outsideclose={false} onopen={onOpen}>
+<Modal title="異常検知" bind:open={show} size="xl" outsideclose={false} onopen={onOpen}>
   <div class="flex flex-col h-[70vh]">
     <div id="chart"></div>
     <div class="m-1 grow overflow-auto">

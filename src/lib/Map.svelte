@@ -150,7 +150,7 @@ size="sm"
     <DropdownItem onclick={() => {clearModal();showAI = true}}>
       <div class="flex items-center space-x-2">
         <Icon path={icons.mdiBrain} size={1} />
-        <span>AI分析</span>
+        <span>異常検知</span>
       </div>
     </DropdownItem>
   </Dropdown>

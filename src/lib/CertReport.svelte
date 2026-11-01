@@ -4,7 +4,7 @@
   import * as icons from "@mdi/js";
   import DataTable from "datatables.net-dt";
   import "datatables.net-select-dt";
-  import { api, renderScore } from "./map";
+  import { api, renderScore, pollings, nodes } from "./map";
   import ja from "datatables.net-plugins/i18n/ja.json";
   import { tick } from "svelte";
   import "../assets/jquery.dataTables.css";
@@ -70,9 +70,87 @@
   const onOpen = async () => {
     if (!api) return;
     try {
-      const path = api.getReportPath ? api.getReportPath("cert") : "/api/report/cert";
-      const res = await api.get(path);
-      dataList = Array.isArray(res) ? res : [];
+      if (api.serverType === "neo") {
+        const list: any[] = [];
+        // 1. Extract from TLS cert pollings (matching twsnmpneo CertReport)
+        if (pollings) {
+          const pollList: any[] = [];
+          for (const k in pollings) {
+            const pVal = pollings[k];
+            if (Array.isArray(pVal)) {
+              pollList.push(...pVal);
+            } else if (pVal && typeof pVal === "object") {
+              pollList.push(pVal);
+            }
+          }
+          const certPolls = pollList.filter((p) => {
+            const pType = String(p.Type || p.type || "").toLowerCase();
+            const pMode = String(p.Mode || p.mode || "").toLowerCase();
+            return pType === "tls" && pMode === "cert";
+          });
+
+          for (const p of certPolls) {
+            const res = (p.Result || p.result || {}) as Record<string, any>;
+            const pNodeId = p.NodeID || p.node_id || p.nodeId || "";
+            const node = nodes && nodes[pNodeId];
+            const rawTarget = res.target || p.Params || p.params || (node ? node.IP || node.ip : "") || "";
+            let host = rawTarget;
+            let port = 443;
+            if (rawTarget.includes(":")) {
+              const parts = rawTarget.split(":");
+              host = parts[0];
+              port = Number(parts[1]) || 443;
+            } else if (!isNaN(Number(rawTarget)) && Number(rawTarget) > 0) {
+              port = Number(rawTarget);
+              host = node ? node.IP || node.ip : "";
+            }
+
+            let notAfterSec = 0;
+            if (res.notAfterUnix) {
+              notAfterSec = Number(res.notAfterUnix);
+            } else if (res.notAfter) {
+              notAfterSec = Math.floor(Date.parse(res.notAfter) / 1000);
+            }
+
+            const state = String(p.State || p.state || "").toLowerCase();
+            const score = state === "normal" ? 40 : (state === "warn" ? 50 : 80);
+
+            list.push({
+              Score: score,
+              Target: host,
+              Port: port,
+              Subject: res.subject || "-",
+              Issuer: res.issuer || "-",
+              Verify: res.verify !== false && res.valid !== "false",
+              NotAfter: notAfterSec,
+            });
+          }
+        }
+
+        // 2. Also check external TLS monitors (/api/cert_monitors)
+        try {
+          const res = await api.get("/api/cert_monitors");
+          if (Array.isArray(res)) {
+            for (const c of res) {
+              list.push({
+                Score: c.Score || (c.state === "error" ? 80 : (c.state === "warn" ? 50 : 40)),
+                Target: c.Target || c.target || "",
+                Port: c.Port || c.port || 443,
+                Subject: c.Subject || c.subject || "-",
+                Issuer: c.Issuer || c.issuer || "-",
+                Verify: c.Verify ?? c.verify ?? true,
+                NotAfter: c.NotAfter || c.notAfter || 0,
+              });
+            }
+          }
+        } catch (_) {}
+
+        dataList = list;
+      } else {
+        const path = api.getReportPath ? api.getReportPath("cert") : "/api/report/cert";
+        const res = await api.get(path);
+        dataList = Array.isArray(res) ? res : [];
+      }
       await showTable();
     } catch (e) {
       console.error("Fetch Cert report failed", e);

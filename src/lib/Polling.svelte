@@ -70,10 +70,15 @@
     if (!nodes|| !pollings) {
       return;
     }
-    for(const k in pollings) {
-      for( const p of pollings[k]) {
-        data.push(p);
-      } 
+    for (const k in pollings) {
+      const pVal = pollings[k];
+      if (Array.isArray(pVal)) {
+        for (const p of pVal) {
+          data.push(p);
+        }
+      } else if (pVal && typeof pVal === "object") {
+        data.push(pVal);
+      }
     }
     await tick();
     showTable();
