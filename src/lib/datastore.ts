@@ -26,6 +26,7 @@ export interface LocConfEnt {
   style: string
   zoom: number
   center: string
+  iconSize?: number
 }
 
 /**
@@ -45,8 +46,9 @@ export class DataStore {
     this.list = [];
     this.locConf = {
       style: "https://tile.openstreetmap.jp/styles/osm-bright-ja/style.json",
-      zoom:2,
-      center:"139.75,35.68"
+      zoom: 2,
+      center: "139.75,35.68",
+      iconSize: 24,
     }
     this.load();
     this.stateMap = new Map();
@@ -74,6 +76,9 @@ export class DataStore {
     const lcv = await Preferences.get({key:"locConf"});
     if( lcv && lcv.value) {
       this.locConf = JSON.parse(lcv.value);
+      if (!this.locConf.iconSize) {
+        this.locConf.iconSize = 24;
+      }
     }
     refreshCount.update(n=>n+1);
     this.checkSite();
@@ -120,8 +125,11 @@ export class DataStore {
    * Saves the general location configuration to persistent storage.
    */
   public async saveLocConf() {
-    if (!this.locConf.style) {
+    if (this.locConf.style === undefined || this.locConf.style === null) {
       this.locConf.style = "https://tile.openstreetmap.jp/styles/osm-bright-ja/style.json";
+    }
+    if (!this.locConf.iconSize) {
+      this.locConf.iconSize = 24;
     }
     const v = JSON.stringify(this.locConf);
     await Preferences.configure({group:"twsnmpmv_conf"});
