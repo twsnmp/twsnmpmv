@@ -14,12 +14,16 @@ description = 'Run tests with vitest'
 run = 'npm test'
 
 [tasks."e2e:test"]
-description = 'Run all Maestro E2E tests'
-run = 'maestro test maestro/'
+description = 'Run Playwright E2E tests'
+run = 'npm run test:e2e'
 
 [tasks."e2e:record"]
-description = 'Run a Maestro flow and record the screen to an MP4 file'
-run = 'maestro record maestro/add_site.yaml'
+description = 'Run E2E test and record screen to MP4/WebM'
+run = 'npm run record:e2e'
+
+[tasks."e2e:ui"]
+description = 'Run Playwright in interactive UI mode'
+run = 'npm run test:e2e:ui'
 
 [tasks.dev]
 description = 'Start development server'

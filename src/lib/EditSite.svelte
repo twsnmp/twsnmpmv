@@ -52,6 +52,8 @@
     </Label>
     <div class="flex justify-end space-x-2 mr-2">
       <GradientButton
+        id="save-site-btn"
+        ariaLabel="保存"
         shadow
         color="blue"
         type="button"

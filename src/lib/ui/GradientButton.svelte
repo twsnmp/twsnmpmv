@@ -3,6 +3,7 @@
 
   let {
     id = undefined,
+    ariaLabel = undefined,
     color = "blue",
     shadow = false,
     type = "button",
@@ -12,6 +13,7 @@
     children,
   }: {
     id?: string;
+    ariaLabel?: string;
     color?: "blue" | "red" | "teal" | "green" | "purple" | "cyan" | "lime";
     shadow?: boolean;
     type?: "button" | "submit" | "reset";
@@ -44,6 +46,7 @@
 
 <button
   {id}
+  aria-label={ariaLabel}
   {type}
   {disabled}
   {onclick}

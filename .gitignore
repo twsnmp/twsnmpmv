@@ -24,3 +24,11 @@ dist-ssr
 *.sw?
 
 .gemini/
+
+# Playwright & E2E Recordings
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+recordings/
+
