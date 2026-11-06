@@ -37,7 +37,7 @@
         paging: false,
         searching: false,
         info: false,
-        scrollY: "35vh",
+        scrollY: "calc(35vh - 50px)",
         scrollX: true,
         language: ja,
       });
@@ -74,7 +74,7 @@
 <Modal title="IPAM" bind:open={show} size="xl" outsideclose={false} onopen={onOpen}>
   <div class="flex flex-col h-[70vh] text-xs sm:text-sm">
     <div id="ipam-report-chart" class="w-full h-[35vh] mb-2"></div>
-    <div class="m-1 overflow-auto">
+    <div class="m-1 grow overflow-hidden">
       <table id="table-ipam-report" class="display compact nowrap text-[10px]" style="width:99%"></table>
     </div>
   </div>

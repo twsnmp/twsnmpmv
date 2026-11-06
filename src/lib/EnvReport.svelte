@@ -44,7 +44,7 @@
         paging: false,
         searching: false,
         info: false,
-        scrollY: "35vh",
+        scrollY: "calc(35vh - 70px)",
         scrollX: true,
         language: ja,
         destroy: true,
@@ -128,7 +128,7 @@
       </div>
       <div id="env-report-chart" class="w-full h-[35vh]"></div>
     </div>
-    <div class="m-1 overflow-auto flex-grow bg-white dark:bg-gray-800">
+    <div class="m-1 overflow-hidden flex-grow bg-white dark:bg-gray-800">
       <table id="table-env-report" class="display compact nowrap text-[10px]" style="width:99%"></table>
     </div>
   </div>

@@ -28,7 +28,7 @@
       paging: false,
       searching:false,
       info:false,
-      scrollY: "35vh",
+      scrollY: "calc(35vh - 50px)",
       scrollX: true,
       language: ja,
       order: [[0, "asc"]],
@@ -75,7 +75,7 @@
 <Modal title="ノードリスト" bind:open={show} size="xl" outsideclose={false} onopen={onOpen}>
   <div class="flex flex-col h-[70vh]">
     <div id="chart"></div>
-    <div class="m-1 grow overflow-auto">
+    <div class="m-1 grow overflow-hidden">
       <table id="table" class="display compact nowrap text-[10px]" style="width:99%"></table>
     </div>
   </div>

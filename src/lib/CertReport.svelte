@@ -36,7 +36,7 @@
         paging: false,
         searching: false,
         info: false,
-        scrollY: "65vh",
+        scrollY: "calc(70vh - 50px)",
         scrollX: true,
         language: ja,
       });
@@ -160,7 +160,7 @@
 
 <Modal title="証明書管理" bind:open={show} size="xl" outsideclose={false} onopen={onOpen}>
   <div class="flex flex-col h-[70vh] text-xs sm:text-sm">
-    <div class="m-1 overflow-auto">
+    <div class="m-1 grow overflow-hidden">
       <table id="table-cert-report" class="display compact nowrap text-[10px]" style="width:99%"></table>
     </div>
   </div>
