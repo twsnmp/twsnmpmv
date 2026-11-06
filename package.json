@@ -12,7 +12,8 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "record:e2e": "node scripts/record.mjs",
-    "check": "svelte-check --tsconfig ./tsconfig.json"
+    "check": "svelte-check --tsconfig ./tsconfig.json",
+    "postinstall": "node scripts/patch-native-run.mjs"
   },
   "devDependencies": {
     "@capacitor/assets": "^4.0.0",

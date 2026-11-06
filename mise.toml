@@ -61,7 +61,10 @@ run = 'npx cap sync android'
 [tasks."sync:ios"]
 description = 'Sync web assets to iOS platform'
 depends = ["build", "set-version"]
-run = 'npx cap sync ios'
+run = [
+    'npx cap sync ios',
+    'node scripts/patch-native-run.mjs'
+]
 
 [tasks."release:android"]
 description = 'Build Android release APK'
