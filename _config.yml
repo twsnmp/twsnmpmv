@@ -17,6 +17,8 @@ exclude:
   - src
   - public
   - resources
-  - maestro
+  - e2e
+  - recordings
+  - scripts
   - mise.toml
   - _config.yml
