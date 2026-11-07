@@ -4,9 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.1.0] - 2026-11-07
+## [2.1.0] - 2026-11-08
 
 ### Added
+- **Report Dialogs Redesign & KPI Cards**: Comprehensively redesigned report and management dialogs (IPAM, Environmental, LAN, Certificate, Event Log, Node, Polling, and Anomaly Detection).
+  - Introduced KPI summary cards showing key metrics at a glance with dark mode and unit support.
+  - Added visual charts (ECharts) across reports to visualize status distribution, severity breakdowns, and health metrics.
+  - IPAM report redesign: added an IP address density heatmap, /24 subnet block distributions, and an interactive 1–254 host grid map optimized for mobile screens.
 - **TWSNMP NEO Support**: Added full support for fetching and displaying report views from TWSNMP NEO instances.
 - **Playwright E2E Testing & Screen Recording**: Migrated the end-to-end testing and video recording pipeline from Maestro to Playwright, enabling automated tests and mobile screen recordings on Mobile Chrome and Mobile Safari.
 - **Enhanced Map Settings**: Improved map configuration options based on twsnmpfk, including enhanced support for MapLibre GL v6 raster/vector tile layers.
@@ -15,12 +19,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - **Svelte 5 & Vite 8 Upgrade**: Migrated the application to Svelte 5 (using `mount()`) and upgraded build tooling to Vite 8.3.6 with `@sveltejs/vite-plugin-svelte` 7.3.1.
 - **Component Refactoring**: Replaced Flowbite dependencies with pure, lightweight Tailwind UI components.
+- **Form Input UX & Auto-conversion**: Improved site edit and settings forms with real-time full-width to half-width character conversion, restricted input characters to valid alphanumeric sets, and optimized iOS keyboard input modes.
 - **Terminology Update**: Renamed "AI Analysis" to "Anomaly Detection" (異常検知) for consistency across TWSNMP FC and TWSNMP NEO.
 - **iOS Deployment Target**: Updated iOS deployment target to 15.0.
 
 ### Fixed
+- **Mobile Viewport & Gesture Improvements**: Disabled unwanted double-tap zoom on iOS/Android WebViews and optimized viewport safe area insets (notches and home indicator).
+- **iOS WebKit Crash & Form Suspend Fixes**: Resolved WebKit `CandidateGeneration` crashes and app suspension issues caused by URL input field responder loss.
+- **Simulator Compatibility**: Fixed `native-run` simulator path detection for Xcode 16+ and filtered non-functional simulators.
 - Fixed duplicated vertical scrollbars on tables with scrollable contents.
 - Fixed Dropdown toggle behavior and removed invalid button nesting in BottomNavItem.
+- Fixed Modal `onopen` infinite loop caused by Svelte 5 `$effect` reactive tracking.
 - Updated security-related dependencies (postcss, undici, capacitor, maplibre-gl).
 
 ---

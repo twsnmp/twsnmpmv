@@ -10,8 +10,8 @@ TWSNMP Map Viewer is a mobile application designed to visualize network status m
 - **Interactive Network Map:** Visualize your network layout with nodes, lines, and status indicators. Supports MapLibre GL background maps.
 - **Real-time Status Updates:** Periodically fetches status from configured sites.
 - **Status Visualization:** Color-coded status (Normal, Warning, Low, High) and icons for quick identification.
-- **Various Report Views:** Environmental monitoring, IPAM, LAN, Certificates, and Anomaly Detection.
-- **Mobile Friendly:** Built with Capacitor for a seamless mobile experience.
+- **Comprehensive Reports & KPI Dashboards:** Redesigned report views for IPAM, Environmental monitoring, LAN, Certificates, Event Logs, Nodes, Pollings, and Anomaly Detection. Equipped with KPI summary cards, status charts, an IP density heatmap, and an interactive host grid.
+- **Mobile Optimized:** Built with Capacitor for a seamless mobile experience with safe area layout and optimized touch and keyboard input handling.
 
 ## Download
 
