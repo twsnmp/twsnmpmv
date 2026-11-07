@@ -293,7 +293,7 @@
 </script>
 
 <Modal title="地図設定" bind:open={show} size="lg" outsideclose={false} onopen={onOpen}>
-  <form class="flex flex-col space-y-3" action="#" onsubmit={(e) => { e.preventDefault(); save(); }}>
+  <form class="flex flex-col space-y-3" onsubmit={(e) => { e.preventDefault(); save(); }}>
     {#if showStyleError}
       <div class="p-3 text-xs sm:text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 border border-red-300 dark:border-red-800 flex items-center gap-2">
         <Icon path={icons.mdiAlert} size={1} />

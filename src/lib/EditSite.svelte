@@ -29,10 +29,10 @@
 </script>
 
 <Modal title="サイト設定" bind:open={show} size="md" outsideclose={false}>
-  <form class="flex flex-col space-y-2" action="#">
+  <form class="flex flex-col space-y-2" onsubmit={(e) => e.preventDefault()}>
     <Label class="space-y-1">
       <span>サイト名</span>
-      <Input bind:value={twsnmp.name} size="sm" />
+      <Input bind:value={twsnmp.name} size="sm" autocomplete="off" autocorrect="off" />
     </Label>
     <Label class="space-y-1">
       <span>種別</span>
@@ -40,15 +40,37 @@
     </Label>
     <Label class="space-y-1">
       <span>URL</span>
-      <Input type="url" bind:value={twsnmp.url} size="sm" />
+      <Input
+        type="text"
+        inputmode="url"
+        bind:value={twsnmp.url}
+        size="sm"
+        placeholder="http://192.168.1.1:8080"
+        autocomplete="off"
+        autocorrect="off"
+        autocapitalize="none"
+        spellcheck={false}
+      />
     </Label>
     <Label class="space-y-1">
       <span>ユーザー名</span>
-      <Input bind:value={twsnmp.user} size="sm" />
+      <Input
+        bind:value={twsnmp.user}
+        size="sm"
+        autocomplete="username"
+        autocorrect="off"
+        autocapitalize="none"
+        spellcheck={false}
+      />
     </Label>
     <Label class="space-y-1">
       <span>パスワード</span>
-      <Input type="password" bind:value={twsnmp.password} size="sm"/>
+      <Input
+        type="password"
+        bind:value={twsnmp.password}
+        size="sm"
+        autocomplete="current-password"
+      />
     </Label>
     <div class="flex justify-end space-x-2 mr-2">
       <GradientButton
