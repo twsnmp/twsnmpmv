@@ -713,7 +713,7 @@ export const resizeChart = () => {
   }
 }
 
-const isDark = (): boolean => {
+export const isDark = (): boolean => {
   const e = document.querySelector("html");
   return e != null && e.classList.contains("dark");
 };

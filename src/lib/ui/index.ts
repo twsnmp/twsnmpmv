@@ -13,3 +13,4 @@ export { default as Select } from "./Select.svelte";
 export { default as Listgroup } from "./Listgroup.svelte";
 export { default as ListgroupItem } from "./ListgroupItem.svelte";
 export { default as Tooltip } from "./Tooltip.svelte";
+export { default as KPICard } from "./KPICard.svelte";

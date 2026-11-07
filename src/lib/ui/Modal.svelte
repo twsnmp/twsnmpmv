@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Snippet } from "svelte";
+  import { untrack, type Snippet } from "svelte";
   import { Icon } from "mdi-svelte-ts";
   import * as icons from "@mdi/js";
 
@@ -29,9 +29,17 @@
     xl: "max-w-5xl",
   };
 
+  let wasOpen = false;
+
   $effect(() => {
-    if (open && onopen) {
-      onopen();
+    const isOpen = open;
+    if (isOpen && !wasOpen) {
+      wasOpen = true;
+      untrack(() => {
+        onopen?.();
+      });
+    } else if (!isOpen) {
+      wasOpen = false;
     }
   });
 

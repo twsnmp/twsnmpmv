@@ -1,21 +1,127 @@
 <script lang="ts">
-  import { Modal, GradientButton } from "./ui";
+  import { Modal, KPICard } from "./ui";
   import { Icon } from "mdi-svelte-ts";
   import * as icons from "@mdi/js";
   import DataTable from "datatables.net-dt";
   import "datatables.net-select-dt";
+  import * as echarts from "echarts";
   import { api, renderScore, pollings, nodes } from "./map";
   import ja from "datatables.net-plugins/i18n/ja.json";
   import { tick } from "svelte";
+  import { isDark, resizeChart } from "./chart";
   import "../assets/jquery.dataTables.css";
 
   export let show = false;
 
   let table: any = undefined;
-  let dataList: any = [];
+  let dataList: any[] = [];
+  let chartElem: HTMLElement | null = null;
+  let chartInstance: echarts.ECharts | null = null;
+
+  let totalCerts = 0;
+  let validCerts = 0;
+  let expiringCerts = 0;
+  let errorCerts = 0;
 
   const close = () => {
     show = false;
+  };
+
+  const getRemainingDays = (notAfterSec: number): number => {
+    if (!notAfterSec || notAfterSec <= 0) return 0;
+    const nowSec = Math.floor(Date.now() / 1000);
+    return Math.ceil((notAfterSec - nowSec) / 86400);
+  };
+
+  const renderCertChart = () => {
+    if (!chartElem || dataList.length === 0) return;
+    if (chartInstance) {
+      chartInstance.dispose();
+    }
+    const dark = isDark();
+    chartInstance = echarts.init(chartElem, dark ? "dark" : undefined);
+
+    let d7 = 0;
+    let d30 = 0;
+    let d90 = 0;
+    let dMore = 0;
+    let expired = 0;
+
+    for (const c of dataList) {
+      const days = getRemainingDays(c.NotAfter);
+      if (days <= 0) expired++;
+      else if (days <= 7) d7++;
+      else if (days <= 30) d30++;
+      else if (days <= 90) d90++;
+      else dMore++;
+    }
+
+    const categories = ["失効", "7日以内", "30日以内", "90日以内", "90日超"];
+    const counts = [expired, d7, d30, d90, dMore];
+    const colors = ["#f43f5e", "#fb7185", "#f59e0b", "#38bdf8", "#10b981"];
+
+    const option: echarts.EChartsOption = {
+      backgroundColor: "transparent",
+      tooltip: {
+        trigger: "axis",
+        axisPointer: { type: "shadow" },
+        formatter: (params: any) => {
+          if (!params || !params.length) return "";
+          const item = params[0];
+          return `<b>${item.name}</b>: ${item.value} 件`;
+        },
+      },
+      grid: {
+        top: 10,
+        bottom: 22,
+        left: 60,
+        right: 30,
+        containLabel: false,
+      },
+      xAxis: {
+        type: "value",
+        minInterval: 1,
+        splitLine: {
+          lineStyle: {
+            color: dark ? "#334155" : "#e2e8f0",
+            type: "dashed",
+          },
+        },
+        axisLabel: {
+          fontSize: 9,
+          color: dark ? "#94a3b8" : "#64748b",
+        },
+      },
+      yAxis: {
+        type: "category",
+        data: categories,
+        axisLine: { show: false },
+        axisTick: { show: false },
+        axisLabel: {
+          fontSize: 10,
+          color: dark ? "#cbd5e1" : "#475569",
+        },
+      },
+      series: [
+        {
+          name: "証明書数",
+          type: "bar",
+          data: counts.map((cnt, idx) => ({
+            value: cnt,
+            itemStyle: { color: colors[idx], borderRadius: [0, 4, 4, 0] },
+          })),
+          label: {
+            show: true,
+            position: "right",
+            fontSize: 10,
+            fontFamily: "monospace",
+            color: dark ? "#94a3b8" : "#64748b",
+          },
+        },
+      ],
+    };
+
+    chartInstance.setOption(option);
   };
 
   const showTable = async () => {
@@ -36,11 +142,12 @@
         paging: false,
         searching: false,
         info: false,
-        scrollY: "calc(70vh - 50px)",
+        scrollY: "calc(35vh - 50px)",
         scrollX: true,
         language: ja,
       });
     }
+    renderCertChart();
   };
 
   const columns = [
@@ -52,7 +159,7 @@
     { 
       data: "Verify", 
       title: "検証", 
-      render: (data: boolean) => data ? "はい" : "いいえ" 
+      render: (data: boolean) => (data ? "合格" : "<span class='text-rose-500 font-bold'>失敗</span>") 
     },
     { 
       data: "NotAfter", 
@@ -60,7 +167,13 @@
       render: (data: number, type: string) => {
         if (type === 'display' && data) {
           const d = new Date(data * 1000);
-          return d.toLocaleDateString();
+          const days = getRemainingDays(data);
+          const badge = days <= 0
+            ? "<span class='text-rose-500 font-bold ml-1'>(失効)</span>"
+            : days <= 30
+            ? `<span class='text-amber-500 font-bold ml-1'>(${days}日)</span>`
+            : `<span class='text-slate-400 ml-1'>(${days}日)</span>`;
+          return `${d.toLocaleDateString()} ${badge}`;
         }
         return data;
       }
@@ -72,7 +185,7 @@
     try {
       if (api.serverType === "neo") {
         const list: any[] = [];
-        // 1. Extract from TLS cert pollings (matching twsnmpneo CertReport)
+        // 1. Extract from TLS cert pollings
         if (pollings) {
           const pollList: any[] = [];
           for (const k in pollings) {
@@ -151,16 +264,93 @@
         const res = await api.get(path);
         dataList = Array.isArray(res) ? res : [];
       }
+
+      let valid = 0;
+      let expiring = 0;
+      let errCount = 0;
+      for (const c of dataList) {
+        const days = getRemainingDays(c.NotAfter);
+        const hasErr = c.Verify === false || days <= 0 || (c.Score !== undefined && c.Score >= 60);
+        if (hasErr) {
+          errCount++;
+        } else if (days <= 30) {
+          expiring++;
+        } else {
+          valid++;
+        }
+      }
+      totalCerts = dataList.length;
+      validCerts = valid;
+      expiringCerts = expiring;
+      errorCerts = errCount;
+
       await showTable();
     } catch (e) {
       console.error("Fetch Cert report failed", e);
     }
   };
+
+  const handleResize = () => {
+    if (chartInstance) chartInstance.resize();
+    resizeChart();
+  };
 </script>
 
+<svelte:window on:resize={handleResize} />
+
 <Modal title="証明書管理" bind:open={show} size="xl" outsideclose={false} onopen={onOpen}>
-  <div class="flex flex-col h-[70vh] text-xs sm:text-sm">
-    <div class="m-1 grow overflow-hidden">
+  <div class="flex flex-col gap-3 text-xs sm:text-sm">
+    <!-- Top KPI Cards -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <KPICard
+        title="監視証明書総数"
+        value={totalCerts}
+        unit="件"
+        subText="TLS監視対象証明書"
+        color="cyan"
+        iconPath={icons.mdiCertificate}
+      />
+      <KPICard
+        title="有効 (30日超)"
+        value={validCerts}
+        unit="件"
+        subText="十分な有効期限残 (Normal)"
+        color="emerald"
+        iconPath={icons.mdiCheckCircle}
+      />
+      <KPICard
+        title="期限切迫 (30日以内)"
+        value={expiringCerts}
+        unit="件"
+        subText="更新推奨 (Warn)"
+        color={expiringCerts > 0 ? "amber" : "slate"}
+        iconPath={icons.mdiAlert}
+      />
+      <KPICard
+        title="失効・検証エラー"
+        value={errorCerts}
+        unit="件"
+        subText="即時対応要 (High / Error)"
+        color={errorCerts > 0 ? "rose" : "slate"}
+        iconPath={icons.mdiAlertOctagon}
+      />
+    </div>
+
+    <!-- Expiration Breakdown Chart -->
+    <div class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 p-3 shadow-xs">
+      <div class="font-bold text-xs text-slate-800 dark:text-slate-200 mb-1 flex items-center gap-1.5">
+        <Icon path={icons.mdiShieldCheck} size={0.75} />
+        <span>TLS証明書有効期限分布</span>
+      </div>
+      {#if dataList.length === 0}
+        <div class="p-6 text-center text-slate-400 text-xs">監視対象の証明書がありません</div>
+      {:else}
+        <div bind:this={chartElem} class="w-full h-32 sm:h-36"></div>
+      {/if}
+    </div>
+
+    <!-- DataTable Container -->
+    <div class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 p-2 shadow-xs overflow-hidden">
       <table id="table-cert-report" class="display compact nowrap text-[10px]" style="width:99%"></table>
     </div>
   </div>

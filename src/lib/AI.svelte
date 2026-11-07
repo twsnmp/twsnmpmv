@@ -1,34 +1,45 @@
 <script lang="ts">
-  import { Modal, GradientButton } from "./ui";
+  import { Modal, KPICard } from "./ui";
   import { Icon } from "mdi-svelte-ts";
   import * as icons from "@mdi/js";
   import DataTable from "datatables.net-dt";
   import "datatables.net-select-dt";
-  import {api,renderScore,renderTime} from "./map";
+  import { api, renderScore, renderTime } from "./map";
   import ja from "datatables.net-plugins/i18n/ja.json";
   import { tick } from "svelte";
-  import {showAIChart,showAIHeatMap,resizeChart} from "./chart";
+  import { showAIChart, showAIHeatMap, resizeChart } from "./chart";
   import "../assets/jquery.dataTables.css";
 
   export let show = false;
-  let table :any = undefined;
-  let data : any = [];
+  let table: any = undefined;
+  let data: any[] = [];
+  let selectedTitle: string = "";
+
+  let totalItems = 0;
+  let highAnomalies = 0;
+  let avgScore = "0.0";
+  let maxScore = "0.0";
+
   const close = () => {
     show = false;
   };
 
   const showTable = () => {
-    if (table && DataTable.isDataTable("#table")) {
+    const tableId = "#ai-table";
+    if (table && DataTable.isDataTable(tableId)) {
       table.clear();
       table.destroy();
       table = undefined;
     }
-    table = new DataTable("#table", {
+    const el = document.querySelector(tableId);
+    if (!el) return;
+
+    table = new DataTable(tableId, {
       columns: columns,
       data: data,
       paging: false,
-      searching:false,
-      info:false,
+      searching: false,
+      info: false,
       scrollY: "calc(35vh - 50px)",
       scrollX: true,
       language: ja,
@@ -37,31 +48,35 @@
       },
       order: [[0, "desc"]],
     });
+
     table.on("select", () => {
-      const ids = table.rows({ selected: true }).data().pluck("ID");
-      if (ids.length == 1) {
-        showHeatMap(ids[0]);
+      const selected = table.rows({ selected: true }).data();
+      if (selected.length === 1) {
+        const row = selected[0];
+        selectedTitle = `${row.NodeName} - ${row.PollingName}`;
+        showHeatMap(row.ID);
       }
     });
+
     table.on("deselect", () => {
-      showAIChart("chart",data);
+      selectedTitle = "";
+      showAIChart("ai-chart", data);
     });
   };
 
-  const showHeatMap = async (id:string) => {
-    if(!api || !id) {
+  const showHeatMap = async (id: string) => {
+    if (!api || !id) {
       return;
     }
     const path = api.getReportPath ? api.getReportPath("ai") : "/api/report/ai/";
     const air = await api.get(path + id);
-    if(air) {
+    if (air) {
       const scoreData = (air.AIResult && air.AIResult.ScoreData) || air.ScoreData;
       if (scoreData) {
-        showAIHeatMap("chart", scoreData);
+        showAIHeatMap("ai-chart", scoreData);
       }
     }
-  }
-
+  };
 
   const columns = [
     {
@@ -86,9 +101,6 @@
       title: "最終確認",
       render: (data: number, type: string) => {
         if (!data) return "";
-        // If data is already in nanoseconds (>= 1e14), pass as is.
-        // If in milliseconds (>= 1e11), multiply by 1e6.
-        // If in seconds (< 1e11), multiply by 1e9.
         const nano = data > 1e14 ? data : (data > 1e11 ? data * 1000 * 1000 : data * 1000 * 1000 * 1000);
         return renderTime(nano, type);
       },
@@ -97,28 +109,91 @@
 
   const onOpen = async () => {
     data = [];
+    selectedTitle = "";
+    if (!api) return;
     const listPath = api.getReportPath ? api.getReportPath("ailist") : "/api/report/ailist";
     const ai = await api.get(listPath);
+    const list: any[] = [];
+    let high = 0;
+    let scoreSum = 0;
+    let max = 0;
+
     if (Array.isArray(ai)) {
-      for(const a of ai) {
+      for (const a of ai) {
         a.NodeName = a.NodeName || a.Node || "";
         a.PollingName = a.PollingName || a.Polling || "";
-        data.push(a);
+        list.push(a);
+        const sc = a.Score || 0;
+        if (sc >= 60) high++;
+        scoreSum += sc;
+        if (sc > max) max = sc;
       }
     }
+
+    data = list;
+    totalItems = list.length;
+    highAnomalies = high;
+    avgScore = list.length > 0 ? (scoreSum / list.length).toFixed(1) : "0.0";
+    maxScore = list.length > 0 ? max.toFixed(1) : "0.0";
+
     await tick();
     showTable();
-    showAIChart("chart",data);
+    showAIChart("ai-chart", data);
   };
 </script>
 
 <svelte:window on:resize={resizeChart} />
 
-<Modal title="異常検知" bind:open={show} size="xl" outsideclose={false} onopen={onOpen}>
-  <div class="flex flex-col h-[70vh]">
-    <div id="chart"></div>
-    <div class="m-1 grow overflow-hidden">
-      <table id="table" class="display compact nowrap text-[10px]" style="width:99%"></table>
+<Modal title="異常検知 (AI分析)" bind:open={show} size="xl" outsideclose={false} onopen={onOpen}>
+  <div class="flex flex-col gap-3 text-xs sm:text-sm">
+    <!-- Top KPI Cards -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <KPICard
+        title="AI分析対象数"
+        value={totalItems}
+        unit="個"
+        subText="分析中のポーリング項目"
+        color="cyan"
+        iconPath={icons.mdiBrain}
+      />
+      <KPICard
+        title="異常検知 (≥60)"
+        value={highAnomalies}
+        unit="個"
+        subText="スコア急上昇項目"
+        color={highAnomalies > 0 ? "rose" : "emerald"}
+        iconPath={icons.mdiAlertOctagon}
+      />
+      <KPICard
+        title="平均異常スコア"
+        value={avgScore}
+        subText="全体平均スコア"
+        color="slate"
+        iconPath={icons.mdiChartLine}
+      />
+      <KPICard
+        title="最大異常スコア"
+        value={maxScore}
+        subText="最高検知スコア"
+        color={Number(maxScore) >= 60 ? "rose" : "amber"}
+        iconPath={icons.mdiArrowUp}
+      />
+    </div>
+
+    <!-- Chart Container -->
+    <div class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 p-3 shadow-xs">
+      <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2 mb-2">
+        <div class="font-bold text-xs text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+          <Icon path={icons.mdiBrain} size={0.75} />
+          <span>{selectedTitle ? `詳細ヒートマップ: ${selectedTitle}` : "異常スコア分布"}</span>
+        </div>
+      </div>
+      <div id="ai-chart" class="w-full h-36 sm:h-40"></div>
+    </div>
+
+    <!-- DataTable Container -->
+    <div class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 p-2 shadow-xs overflow-hidden">
+      <table id="ai-table" class="display compact nowrap text-[10px]" style="width:99%"></table>
     </div>
   </div>
 </Modal>
@@ -126,11 +201,6 @@
 <style>
   table.nowrap {
     white-space: nowrap;
-  }
-  #chart {
-    width: 98%;
-    height: 35vh;
-    margin: 0 auto;
   }
   :global(.dataTables_wrapper .dataTables_scrollBody) {
     font-size: 10px;
