@@ -3,10 +3,14 @@
   import { ds, type TwsnmpEnt } from "./datastore";
   import { Icon } from "mdi-svelte-ts";
   import * as icons from "@mdi/js";
-  import { toHalfWidth } from "./util";
+  import { filterUrl, filterUsername, filterPassword } from "./util";
 
   export let show = false;
   export let twsnmp : TwsnmpEnt;
+
+  let isComposingUrl = false;
+  let isComposingUser = false;
+  let isComposingPassword = false;
 
   const serverTypeOptions = [
     { value: "auto", name: "自動判定 (推奨)" },
@@ -24,29 +28,53 @@
 
   const save = () => {
     if (twsnmp) {
-      if (twsnmp.url) twsnmp.url = toHalfWidth(twsnmp.url).trim();
-      if (twsnmp.user) twsnmp.user = toHalfWidth(twsnmp.user).trim();
-      if (twsnmp.password) twsnmp.password = toHalfWidth(twsnmp.password);
+      if (twsnmp.url) twsnmp.url = filterUrl(twsnmp.url);
+      if (twsnmp.user) twsnmp.user = filterUsername(twsnmp.user);
+      if (twsnmp.password) twsnmp.password = filterPassword(twsnmp.password);
       ds.save(twsnmp);
     }
     show = false;
   };
 
-  const normalizeUrl = () => {
+  const onUrlInput = () => {
+    if (isComposingUrl) return;
     if (twsnmp?.url) {
-      twsnmp.url = toHalfWidth(twsnmp.url).trim();
+      twsnmp.url = filterUrl(twsnmp.url);
     }
   };
 
-  const normalizeUser = () => {
+  const onUrlCompositionEnd = () => {
+    isComposingUrl = false;
+    if (twsnmp?.url) {
+      twsnmp.url = filterUrl(twsnmp.url);
+    }
+  };
+
+  const onUserInput = () => {
+    if (isComposingUser) return;
     if (twsnmp?.user) {
-      twsnmp.user = toHalfWidth(twsnmp.user).trim();
+      twsnmp.user = filterUsername(twsnmp.user);
     }
   };
 
-  const normalizePassword = () => {
+  const onUserCompositionEnd = () => {
+    isComposingUser = false;
+    if (twsnmp?.user) {
+      twsnmp.user = filterUsername(twsnmp.user);
+    }
+  };
+
+  const onPasswordInput = () => {
+    if (isComposingPassword) return;
     if (twsnmp?.password) {
-      twsnmp.password = toHalfWidth(twsnmp.password);
+      twsnmp.password = filterPassword(twsnmp.password);
+    }
+  };
+
+  const onPasswordCompositionEnd = () => {
+    isComposingPassword = false;
+    if (twsnmp?.password) {
+      twsnmp.password = filterPassword(twsnmp.password);
     }
   };
 </script>
@@ -73,6 +101,7 @@
         type="text"
         inputmode="url"
         lang="en"
+        pattern="[A-Za-z0-9\-._~:/?#\[\]@!$&'()*+,;%=]+"
         bind:value={twsnmp.url}
         size="sm"
         placeholder="http://192.168.1.1:8080"
@@ -80,8 +109,10 @@
         autocorrect="off"
         autocapitalize="none"
         spellcheck={false}
-        onblur={normalizeUrl}
-        oncompositionend={normalizeUrl}
+        oninput={onUrlInput}
+        oncompositionstart={() => { isComposingUrl = true; }}
+        oncompositionend={onUrlCompositionEnd}
+        onblur={onUrlCompositionEnd}
       />
     </Label>
     <Label class="space-y-1">
@@ -90,6 +121,7 @@
         type="text"
         inputmode="email"
         lang="en"
+        pattern="[A-Za-z0-9._\-@]+"
         bind:value={twsnmp.user}
         size="sm"
         placeholder="admin"
@@ -97,8 +129,10 @@
         autocorrect="off"
         autocapitalize="none"
         spellcheck={false}
-        onblur={normalizeUser}
-        oncompositionend={normalizeUser}
+        oninput={onUserInput}
+        oncompositionstart={() => { isComposingUser = true; }}
+        oncompositionend={onUserCompositionEnd}
+        onblur={onUserCompositionEnd}
       />
     </Label>
     <Label class="space-y-1">
@@ -109,8 +143,10 @@
         bind:value={twsnmp.password}
         size="sm"
         autocomplete="current-password"
-        onblur={normalizePassword}
-        oncompositionend={normalizePassword}
+        oninput={onPasswordInput}
+        oncompositionstart={() => { isComposingPassword = true; }}
+        oncompositionend={onPasswordCompositionEnd}
+        onblur={onPasswordCompositionEnd}
       />
     </Label>
     <div class="flex justify-end space-x-2 mr-2">

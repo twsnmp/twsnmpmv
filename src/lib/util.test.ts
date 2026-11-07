@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { toHalfWidth } from "./util";
+import { toHalfWidth, filterUrl, filterUsername, filterPassword } from "./util";
 
 describe("toHalfWidth", () => {
   it("converts full-width alphanumeric to half-width", () => {
@@ -24,5 +24,29 @@ describe("toHalfWidth", () => {
 
   it("handles empty or falsy strings gracefully", () => {
     expect(toHalfWidth("")).toBe("");
+  });
+});
+
+describe("filterUrl", () => {
+  it("converts full-width URL and removes any Japanese kana/kanji", () => {
+    expect(filterUrl("ｈｔｔｐ：／／１９２．１６８．１．１：８０８０あああ")).toBe("http://192.168.1.1:8080");
+    expect(filterUrl("https://example.com/api?test=1")).toBe("https://example.com/api?test=1");
+    expect(filterUrl("")).toBe("");
+  });
+});
+
+describe("filterUsername", () => {
+  it("converts full-width alphanumeric and strips unauthorized characters", () => {
+    expect(filterUsername("ａｄｍｉｎ＿０１山田")).toBe("admin_01");
+    expect(filterUsername("user.name@domain")).toBe("user.name@domain");
+    expect(filterUsername("")).toBe("");
+  });
+});
+
+describe("filterPassword", () => {
+  it("converts full-width characters and keeps printable ASCII characters", () => {
+    expect(filterPassword("Ｐａｓｓｗｏｒｄ１２３！")).toBe("Password123!");
+    expect(filterPassword("Secret@123_#")).toBe("Secret@123_#");
+    expect(filterPassword("")).toBe("");
   });
 });
