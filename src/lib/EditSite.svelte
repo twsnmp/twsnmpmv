@@ -70,7 +70,7 @@
     <Label class="space-y-1">
       <span>URL</span>
       <Input
-        type="url"
+        type="text"
         inputmode="url"
         lang="en"
         bind:value={twsnmp.url}
@@ -81,6 +81,7 @@
         autocapitalize="none"
         spellcheck={false}
         onblur={normalizeUrl}
+        oncompositionend={normalizeUrl}
       />
     </Label>
     <Label class="space-y-1">
@@ -97,6 +98,7 @@
         autocapitalize="none"
         spellcheck={false}
         onblur={normalizeUser}
+        oncompositionend={normalizeUser}
       />
     </Label>
     <Label class="space-y-1">
@@ -108,6 +110,7 @@
         size="sm"
         autocomplete="current-password"
         onblur={normalizePassword}
+        oncompositionend={normalizePassword}
       />
     </Label>
     <div class="flex justify-end space-x-2 mr-2">
