@@ -3,6 +3,7 @@
   import { ds, type TwsnmpEnt } from "./datastore";
   import { Icon } from "mdi-svelte-ts";
   import * as icons from "@mdi/js";
+  import { toHalfWidth } from "./util";
 
   export let show = false;
   export let twsnmp : TwsnmpEnt;
@@ -22,17 +23,45 @@
   };
 
   const save = () => {
-    ds.save(twsnmp);
+    if (twsnmp) {
+      if (twsnmp.url) twsnmp.url = toHalfWidth(twsnmp.url).trim();
+      if (twsnmp.user) twsnmp.user = toHalfWidth(twsnmp.user).trim();
+      if (twsnmp.password) twsnmp.password = toHalfWidth(twsnmp.password);
+      ds.save(twsnmp);
+    }
     show = false;
   };
 
+  const normalizeUrl = () => {
+    if (twsnmp?.url) {
+      twsnmp.url = toHalfWidth(twsnmp.url).trim();
+    }
+  };
+
+  const normalizeUser = () => {
+    if (twsnmp?.user) {
+      twsnmp.user = toHalfWidth(twsnmp.user).trim();
+    }
+  };
+
+  const normalizePassword = () => {
+    if (twsnmp?.password) {
+      twsnmp.password = toHalfWidth(twsnmp.password);
+    }
+  };
 </script>
 
 <Modal title="サイト設定" bind:open={show} size="md" outsideclose={false}>
   <form class="flex flex-col space-y-2" onsubmit={(e) => e.preventDefault()}>
     <Label class="space-y-1">
       <span>サイト名</span>
-      <Input bind:value={twsnmp.name} size="sm" autocomplete="off" autocorrect="off" />
+      <Input
+        bind:value={twsnmp.name}
+        size="sm"
+        placeholder="例: 本社TWSNMP"
+        autocomplete="off"
+        autocorrect="off"
+      />
     </Label>
     <Label class="space-y-1">
       <span>種別</span>
@@ -41,8 +70,9 @@
     <Label class="space-y-1">
       <span>URL</span>
       <Input
-        type="text"
+        type="url"
         inputmode="url"
+        lang="en"
         bind:value={twsnmp.url}
         size="sm"
         placeholder="http://192.168.1.1:8080"
@@ -50,26 +80,34 @@
         autocorrect="off"
         autocapitalize="none"
         spellcheck={false}
+        onblur={normalizeUrl}
       />
     </Label>
     <Label class="space-y-1">
       <span>ユーザー名</span>
       <Input
+        type="text"
+        inputmode="email"
+        lang="en"
         bind:value={twsnmp.user}
         size="sm"
+        placeholder="admin"
         autocomplete="username"
         autocorrect="off"
         autocapitalize="none"
         spellcheck={false}
+        onblur={normalizeUser}
       />
     </Label>
     <Label class="space-y-1">
       <span>パスワード</span>
       <Input
         type="password"
+        lang="en"
         bind:value={twsnmp.password}
         size="sm"
         autocomplete="current-password"
+        onblur={normalizePassword}
       />
     </Label>
     <div class="flex justify-end space-x-2 mr-2">

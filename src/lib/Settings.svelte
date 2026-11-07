@@ -330,11 +330,11 @@
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
       <Label class="space-y-1 text-xs">
         <span>緯度</span>
-        <Input type="text" bind:value={lat} placeholder="35.68" size="sm" />
+        <Input type="text" inputmode="decimal" lang="en" bind:value={lat} placeholder="35.68" size="sm" />
       </Label>
       <Label class="space-y-1 text-xs">
         <span>経度</span>
-        <Input type="text" bind:value={lng} placeholder="139.75" size="sm" />
+        <Input type="text" inputmode="decimal" lang="en" bind:value={lng} placeholder="139.75" size="sm" />
       </Label>
       <Label class="space-y-1 text-xs">
         <span>ズーム</span>
